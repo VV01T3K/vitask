@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "4kqBAyIA7vs=",
+  "success": true,
+  "projectFilePath": "/workspaces/vitask/apps/backend/backend.csproj",
+  "expectedPackageFiles": [
+    "/home/vscode/.nuget/packages/microsoft.aspnetcore.openapi/10.0.6/microsoft.aspnetcore.openapi.10.0.6.nupkg.sha512",
+    "/home/vscode/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
