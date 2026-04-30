@@ -1,0 +1,9 @@
+{
+  "name": "backend",
+  "private": true,
+  "scripts": {
+    "dev": "dotnet watch",
+    "build": "dotnet build",
+    "preview": "dotnet run"
+  }
+}
