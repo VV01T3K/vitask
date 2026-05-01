@@ -4,8 +4,7 @@ packages:
 
 catalog:
   "@types/node": ^24
-  lucide-react: ^1.14.0
-  typescript: ^5
+  typescript: ^6
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vite-plus: latest
   vitest: npm:@voidzero-dev/vite-plus-test@latest
