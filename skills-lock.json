@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "btca-cli": {
+      "source": "davis7dotsh/better-context",
+      "sourceType": "github",
+      "skillPath": "skills/btca-cli/SKILL.md",
+      "computedHash": "99bc5301f4f839a6f3be99d98955f32f1cd576c218731fa05fa54a003bd20e9b"
+    },
+    "configuring-opentelemetry-dotnet": {
+      "source": "dotnet/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/dotnet-aspnet/skills/configuring-opentelemetry-dotnet/SKILL.md",
+      "computedHash": "736b7476710267bd46154714f38e16f5bac5498ce6a9aa980eb1d0a214960890"
+    },
+    "csharp-scripts": {
+      "source": "dotnet/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/dotnet/skills/csharp-scripts/SKILL.md",
+      "computedHash": "bdc8842ae9d26db3e7ad52a401b6942baffd4d1be431d5f7da7ca77e4eb5244d"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "optimizing-ef-core-queries": {
+      "source": "dotnet/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/dotnet-data/skills/optimizing-ef-core-queries/SKILL.md",
+      "computedHash": "265a890a57f60bf55d79fb92483176aca3c6e5c88c23cd75d18911e8354d0e87"
+    }
+  }
+}
