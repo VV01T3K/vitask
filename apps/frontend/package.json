@@ -9,7 +9,9 @@
     "dev": "vp dev --port 3000",
     "build": "vp build",
     "preview": "vp preview",
-    "test": "vp test run"
+    "test": "vp test run",
+    "check": "vp check",
+    "fix": "vp check --fix"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

@@ -4,6 +4,9 @@
   "scripts": {
     "dev": "dotnet watch",
     "build": "dotnet build",
-    "preview": "dotnet run"
+    "preview": "dotnet run",
+    "restore": "dotnet restore",
+    "fix": "dotnet csharpier format . && dotnet format --severity info",
+    "check": "dotnet csharpier check . && dotnet format --verify-no-changes --severity info"
   }
 }
