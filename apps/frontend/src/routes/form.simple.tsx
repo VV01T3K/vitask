@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { useAppForm } from "#/hooks/demo.form";
+import { useAppForm } from "#/integrations/tanstack/form";
 
-export const Route = createFileRoute("/demo/form/simple")({
+export const Route = createFileRoute("/form/simple")({
   component: SimpleForm,
 });
 
@@ -30,18 +30,18 @@ function SimpleForm() {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white"
+      className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-100 to-blue-100 p-4 text-white"
       style={{
         backgroundImage:
           "radial-gradient(50% 50% at 5% 40%, #add8e6 0%, #0000ff 70%, #00008b 100%)",
       }}
     >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
+      <div className="w-full max-w-2xl rounded-xl border-8 border-black/10 bg-black/50 p-8 shadow-xl backdrop-blur-md">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit();
+            void form.handleSubmit();
           }}
           className="space-y-6"
         >
