@@ -4,6 +4,14 @@ Welcome to your new TanStack Start app!
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
+## Environment
+
+Create `apps/frontend/.env.local` with the server-only Groq key before using the `/ai` route:
+
+```bash
+GROQ_API_KEY="gsk_..."
+```
+
 ## ✨ Features
 
 ## Architecture
