@@ -23,13 +23,13 @@
     ".mise-setup-done": true
   },
   "files.watcherExclude": {
-    "**/*.gen.ts": true,
+    "**/*.gen.ts": true
   },
   "search.exclude": {
-    "**/*.gen.ts": true,
+    "**/*.gen.ts": true
   },
   "files.readonlyInclude": {
-    "**/*.gen.ts": true,
+    "**/*.gen.ts": true
   },
   "[css]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
@@ -57,5 +57,6 @@
   },
   "[csharp]": {
     "editor.defaultFormatter": "csharpier.csharpier-vscode"
-  }
+  },
+  "csharpier.dev.useCustomPath": false
 }

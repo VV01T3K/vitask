@@ -1,3 +1,33 @@
+## Development
+
+use vpr (pnpm under the hood)
+
+Never touch staged files
+
+- Check everything:
+
+```bash
+vpr check
+```
+
+- Try to fix everything:
+
+```bash
+vpr fix
+```
+
+- Build the monorepo:
+
+```bash
+vpr -r build
+```
+
+- Run the development servers:
+
+```bash
+vpr dev
+```
+
 <!-- intent-skills:start -->
 
 ## Skill Loading
@@ -42,33 +72,5 @@ skills:
 - when: "typed devtools event clients, bidirectional events, or instrumentation"
   use: "@tanstack/devtools-event-client#devtools-event-client"
 - when: "TanStack Start server runtime, request/response utilities, cookies, sessions, or createStartHandler"
-  use: "@tanstack/start-server-core#start-server-core"
+use: "@tanstack/start-server-core#start-server-core"
 <!-- intent-skills:end -->
-
-## Development
-
-use vpr (pnpm under the hood)
-
-- Check everything:
-
-```bash
-vpr check
-```
-
-- Try to fix everything:
-
-```bash
-vpr fix
-```
-
-- Build the monorepo:
-
-```bash
-vpr -r build
-```
-
-- Run the development servers:
-
-```bash
-vpr dev
-```

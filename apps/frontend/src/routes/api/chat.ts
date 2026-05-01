@@ -9,7 +9,6 @@ import {
   getDemoChatWriteTarget,
   proxyDemoChatStream,
 } from "#/integrations/durable-streams/chat.server";
-import { isDemoChatId } from "#/integrations/tanstack/ai/chat-session";
 
 const GROQ_MODEL = "openai/gpt-oss-120b";
 type GroqTextMessage = ConstrainedModelMessage<{
@@ -22,13 +21,6 @@ export const Route = createFileRoute("/api/chat")({
     handlers: {
       GET: async ({ request }) => proxyDemoChatStream(request),
       POST: async ({ request }) => {
-        const url = new URL(request.url);
-        const chatId = url.searchParams.get("id");
-
-        if (!isDemoChatId(chatId)) {
-          return Response.json({ error: "Invalid chat id." }, { status: 400 });
-        }
-
         const apiKey = process.env.GROQ_API_KEY;
 
         if (!apiKey) {

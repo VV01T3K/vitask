@@ -5,8 +5,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle, Send, Square } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { DEMO_CHAT_ID } from "#/integrations/tanstack/ai/chat-session";
-import { getDemoChatSnapshotFn } from "#/integrations/tanstack/ai/durable-chat.functions";
+import { getDemoChatSnapshotFn } from "#/integrations/tanstack/ai/chat.functions";
+
+const CHAT_ID = "vitask-demo-chat";
 
 export const Route = createFileRoute("/ai")({
   loader: () => getDemoChatSnapshotFn(),
@@ -19,14 +20,14 @@ function AiRoute() {
   const connection = useMemo(
     () =>
       durableStreamConnection({
-        sendUrl: `/api/chat?id=${encodeURIComponent(DEMO_CHAT_ID)}`,
-        readUrl: `/api/chat?id=${encodeURIComponent(DEMO_CHAT_ID)}`,
+        sendUrl: `/api/chat?id=${encodeURIComponent(CHAT_ID)}`,
+        readUrl: `/api/chat?id=${encodeURIComponent(CHAT_ID)}`,
         initialOffset: offset,
       }),
     [offset],
   );
   const { messages, sendMessage, isLoading, error, stop, sessionGenerating } = useChat({
-    id: DEMO_CHAT_ID,
+    id: CHAT_ID,
     connection,
     initialMessages,
     live: true,

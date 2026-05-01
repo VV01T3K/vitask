@@ -1,0 +1,24 @@
+{
+  "name": "@vitask/backend-api",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "gen": "orval -c orval.config.ts",
+    "dev": "orval -c orval.config.ts --watch"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.100.6",
+    "@types/node": "catalog:",
+    "orval": "^8.9.0",
+    "oxfmt": "0.47.0",
+    "typescript": "catalog:",
+    "zod": "^4.4.1"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.100.6",
+    "zod": "^4.4.1"
+  }
+}

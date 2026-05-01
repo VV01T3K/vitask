@@ -4,9 +4,7 @@ const LOCAL_HTTP_WARNING = "[DurableStream] Using HTTP (not HTTPS)";
 
 export function useSuppressLocalDurableStreamWarning() {
   useEffect(() => {
-    if (import.meta.env.PROD) {
-      return;
-    }
+    if (import.meta.env.PROD) return;
 
     const originalWarn = console.warn;
 

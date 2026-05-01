@@ -6,7 +6,7 @@ import { ThemeProvider } from "next-themes";
 
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { useSuppressLocalDurableStreamWarning } from "../integrations/tanstack/ai/suppress-local-durable-stream-warning";
+import { useSuppressLocalDurableStreamWarning } from "../integrations/durable-streams/suppress-no-https-warning";
 import TanStackQueryDevtools from "../integrations/tanstack/query/devtools";
 
 import appCss from "../styles.css?url";

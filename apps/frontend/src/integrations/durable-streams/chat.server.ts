@@ -5,7 +5,6 @@ import {
 } from "@durable-streams/tanstack-ai-transport";
 import type { UIMessage } from "@tanstack/ai";
 
-import { DEMO_CHAT_ID, isDemoChatId } from "#/integrations/tanstack/ai/chat-session";
 
 const DURABLE_STREAM_HOST = "127.0.0.1";
 const DURABLE_STREAM_PORT = 4437;
@@ -38,12 +37,6 @@ export async function getDemoChatWriteTarget() {
 
 export async function proxyDemoChatStream(request: Request): Promise<Response> {
   const requestUrl = new URL(request.url);
-  const chatId = requestUrl.searchParams.get("id");
-
-  if (!isDemoChatId(chatId)) {
-    return Response.json({ error: "Invalid chat id." }, { status: 400 });
-  }
-
   const upstreamUrl = new URL(await ensureDemoChatStream());
 
   for (const [key, value] of requestUrl.searchParams) {
@@ -76,7 +69,7 @@ async function ensureDemoChatStream(): Promise<string> {
 
 async function getDemoChatStreamUrl(): Promise<string> {
   const serverUrl = await getDurableStreamServerUrl();
-  return `${serverUrl}/v1/stream/${encodeURIComponent(DEMO_CHAT_ID)}`;
+  return `${serverUrl}/v1/stream/${encodeURIComponent("vitask-demo-chat")}`;
 }
 
 async function getDurableStreamServerUrl(): Promise<string> {
