@@ -8,6 +8,7 @@ export default function Header() {
       <nav>
         <Link to="/">Home</Link>
         <Link to="/ai">AI</Link>
+        <Link to="/tasks">Tasks</Link>
         <Link to="/form/simple">Simple Form</Link>
         <ThemeToggle />
       </nav>

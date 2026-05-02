@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    "./query": "./index.ts",
+    "./model": "./gen/model/index.ts"
   },
   "scripts": {
     "gen": "orval -c orval.config.ts",

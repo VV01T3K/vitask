@@ -5,7 +5,6 @@ import {
 } from "@durable-streams/tanstack-ai-transport";
 import type { UIMessage } from "@tanstack/ai";
 
-
 const DURABLE_STREAM_HOST = "127.0.0.1";
 const DURABLE_STREAM_PORT = 4437;
 
