@@ -3,7 +3,7 @@ import { defineConfig } from "orval";
 export default defineConfig({
   backend: {
     input: {
-      target: "../../apps/backend/openapi/schema.json",
+      target: "../../apps/backend/openapi/backend.json",
     },
     output: {
       target: "gen/endpoints",

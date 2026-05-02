@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OpenApiGenerateDocuments Condition="'$(Configuration)' == 'Debug'"
-      >false</OpenApiGenerateDocuments
+      >true</OpenApiGenerateDocuments
     >
     <OpenApiGenerateDocuments Condition="'$(OpenApiGenerateDocuments)' == ''"
       >false</OpenApiGenerateDocuments
