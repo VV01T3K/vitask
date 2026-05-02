@@ -110,6 +110,27 @@ public static class TaskEndpoints
             .Produces<TaskResponse>()
             .Produces(StatusCodes.Status404NotFound);
 
+        tasks
+            .MapDelete(
+                "/{id:guid}",
+                async Task<IResult> (
+                    Guid id,
+                    VitaskDbContext dbContext,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    var deletedCount = await dbContext
+                        .Tasks.Where(task => task.Id == id)
+                        .ExecuteDeleteAsync(cancellationToken);
+
+                    return deletedCount == 0 ? TypedResults.NotFound() : TypedResults.NoContent();
+                }
+            )
+            .WithName("DeleteTask")
+            .WithSummary("Delete a task")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
+
         return endpoints;
     }
 

@@ -1,6 +1,6 @@
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { api, model } from "@vitask/backend-api";
-import { CheckSquare, Loader2, Plus } from "lucide-react";
+import { CheckSquare, Loader2, Plus, Trash2 } from "lucide-react";
 import { Suspense } from "react";
 import { z } from "zod";
 
@@ -152,26 +152,60 @@ function TaskList() {
   return (
     <ul className="flex flex-col gap-2">
       {tasks.map((task) => (
-        <li
-          className="flex flex-col gap-1 rounded-lg border border-zinc-200 bg-white px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
-          key={task.id}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-              {task.title}
-            </span>
-            {task.dueDate ? (
-              <span className="shrink-0 rounded-full bg-cyan-50 px-2 py-0.5 text-xs font-medium text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300">
-                {task.dueDate}
-              </span>
-            ) : null}
-          </div>
-          {task.notes ? (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">{task.notes}</p>
-          ) : null}
-        </li>
+        <TaskListItem key={task.id} task={task} />
       ))}
     </ul>
+  );
+}
+
+function TaskListItem({ task }: { task: model.TaskResponse }) {
+  const { queryClient } = useRouteContext({ from: "/tasks" });
+  const { isPending, mutate } = api.useDeleteTask();
+
+  return (
+    <li className="flex flex-col gap-1 rounded-lg border border-zinc-200 bg-white px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="flex items-start justify-between gap-2">
+        <span className="min-w-0 text-sm font-medium wrap-break-word text-zinc-900 dark:text-zinc-100">
+          {task.title}
+        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          {task.dueDate ? (
+            <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-xs font-medium text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300">
+              {task.dueDate}
+            </span>
+          ) : null}
+          <button
+            aria-label={`Delete ${task.title}`}
+            className="inline-flex size-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-zinc-500 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+            disabled={isPending}
+            onClick={() => {
+              if (!window.confirm(`Delete "${task.title}"?`)) return;
+
+              mutate(
+                { id: task.id },
+                {
+                  onError: (error) => {
+                    console.error("Unable to delete task", error);
+                  },
+                  onSuccess: async () => {
+                    await queryClient.invalidateQueries({ queryKey: api.getListTasksQueryKey() });
+                  },
+                },
+              );
+            }}
+            title="Delete task"
+            type="button"
+          >
+            {isPending ? (
+              <Loader2 aria-hidden="true" className="animate-spin" size={15} />
+            ) : (
+              <Trash2 aria-hidden="true" size={15} />
+            )}
+          </button>
+        </div>
+      </div>
+      {task.notes ? <p className="text-xs text-zinc-500 dark:text-zinc-400">{task.notes}</p> : null}
+    </li>
   );
 }
 

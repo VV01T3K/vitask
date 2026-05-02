@@ -372,3 +372,103 @@ export function useGetTaskSuspense<TData = Awaited<ReturnType<typeof getTask>>, 
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Delete a task
+ */
+export type deleteTaskResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteTaskResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type deleteTaskResponseSuccess = deleteTaskResponse204 & {
+  headers: Headers;
+};
+export type deleteTaskResponseError = deleteTaskResponse404 & {
+  headers: Headers;
+};
+
+export const getDeleteTaskUrl = (id: string) => {
+  return `http://localhost:5107/tasks/${id}`;
+};
+
+export const deleteTask = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteTaskResponseSuccess> => {
+  const res = await fetch(getDeleteTaskUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: deleteTaskResponseError["data"]; status?: number } =
+      new globalThis.Error();
+    const data: deleteTaskResponseError["data"] = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
+  const data: deleteTaskResponseSuccess["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteTaskResponseSuccess;
+};
+
+export const getDeleteTaskMutationOptions = <TError = void, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteTask>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteTask>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteTask"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTask>>, { id: string }> = (
+    props,
+  ) => {
+    const { id } = props ?? {};
+
+    return deleteTask(id, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteTaskMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTask>>>;
+
+export type DeleteTaskMutationError = void;
+
+/**
+ * @summary Delete a task
+ */
+export const useDeleteTask = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteTask>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof deleteTask>>, TError, { id: string }, TContext> => {
+  return useMutation(getDeleteTaskMutationOptions(options), queryClient);
+};
