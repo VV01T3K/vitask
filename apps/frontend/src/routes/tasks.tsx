@@ -1,17 +1,14 @@
-import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
-import {
-  getListTasksQueryKey,
-  getListTasksSuspenseQueryOptions,
-  useCreateTask,
-  useListTasksSuspense,
-} from "@vitask/backend-api/query";
+import { api, model } from "@vitask/backend-api";
 import { CheckSquare, Loader2, Plus } from "lucide-react";
 import { Suspense } from "react";
+import { z } from "zod";
+
+import { useAppForm } from "#/integrations/tanstack/form";
 
 export const Route = createFileRoute("/tasks")({
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(getListTasksSuspenseQueryOptions()),
+    queryClient.ensureQueryData(api.getListTasksSuspenseQueryOptions()),
   component: TasksRoute,
 });
 
@@ -34,35 +31,58 @@ function TasksRoute() {
   );
 }
 
+const taskFormSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(
+        model.createTaskRequestTitleMin,
+        `Title must be at least ${model.createTaskRequestTitleMin} characters`,
+      )
+      .max(
+        model.createTaskRequestTitleMax,
+        `Title must be at most ${model.createTaskRequestTitleMax} characters`,
+      ),
+    notes: z.string().optional(),
+    dueDate: z.iso.date().optional(),
+  })
+  .transform((value): z.input<typeof model.CreateTaskRequest> => value)
+  .pipe(model.CreateTaskRequest);
+
 function CreateTaskForm() {
   const { queryClient } = useRouteContext({ from: "/tasks" });
-  const { mutateAsync } = useCreateTask();
+  const { isPending, mutate } = api.useCreateTask();
 
-  const form = useForm({
-    defaultValues: { title: "", notes: "", dueDate: "" },
-    onSubmit: async ({ value, formApi }) => {
-      const result = await mutateAsync({
-        data: {
-          title: value.title,
-          notes: value.notes || undefined,
-          dueDate: value.dueDate || undefined,
+  const form = useAppForm({
+    defaultValues: {
+      title: "",
+      notes: "",
+      dueDate: undefined,
+    } as z.input<typeof taskFormSchema>,
+    validators: {
+      onChange: taskFormSchema,
+      onSubmit: taskFormSchema,
+    },
+    onSubmit: ({ value, formApi }) => {
+      const parsedTask = model.CreateTaskRequest.safeParse(value);
+      if (!parsedTask.success) return;
+
+      mutate(
+        { data: parsedTask.data },
+        {
+          onError: (error) => {
+            console.error("Unable to create task", error);
+            formApi.setErrorMap({
+              onServer: "The backend could not create the task. Please try again.",
+            } as never);
+          },
+          onSuccess: async () => {
+            formApi.reset();
+            await queryClient.invalidateQueries({ queryKey: api.getListTasksQueryKey() });
+          },
         },
-      });
-
-      if (result.status === 400) {
-        const errors = result.data.errors ?? {};
-        for (const [key, messages] of Object.entries(errors)) {
-          const fieldName = (key.charAt(0).toLowerCase() + key.slice(1)) as keyof typeof value;
-          formApi.setFieldMeta(fieldName, (meta) => ({
-            ...meta,
-            errorMap: { ...meta.errorMap, onServer: messages[0] },
-          }));
-        }
-        return;
-      }
-
-      formApi.reset();
-      await queryClient.invalidateQueries({ queryKey: getListTasksQueryKey() });
+      );
     },
   });
 
@@ -72,115 +92,52 @@ function CreateTaskForm() {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void form.handleSubmit();
+        void form.handleSubmit().catch((error: unknown) => {
+          console.error("Unable to create task", error);
+        });
       }}
     >
       <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">New task</h2>
 
-      <form.Field
-        name="title"
-        validators={{
-          onSubmit: ({ value }) => {
-            if (!value || value.length < 3) return "Title must be at least 3 characters";
-            if (value.length > 120) return "Title must be at most 120 characters";
-          },
-        }}
-      >
+      <form.AppField name="title">
         {(field) => (
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300" htmlFor="title">
-              Title{" "}
-              <span aria-hidden="true" className="text-red-500">
-                *
-              </span>
-            </label>
-            <input
-              className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-950 transition outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-cyan-300"
-              disabled={field.form.state.isSubmitting}
-              id="title"
-              name={field.name}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="What needs to be done?"
-              type="text"
-              value={field.state.value}
-            />
-            {field.state.meta.errors.length > 0 ? (
-              <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
-            ) : null}
-          </div>
+          <field.TextField id="title" label="Title" placeholder="What needs to be done?" required />
         )}
-      </form.Field>
+      </form.AppField>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <form.Field name="dueDate">
-          {(field) => (
-            <div className="flex flex-col gap-1">
-              <label
-                className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-                htmlFor="dueDate"
-              >
-                Due date
-              </label>
-              <input
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-950 transition outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-cyan-300"
-                disabled={field.form.state.isSubmitting}
-                id="dueDate"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                type="date"
-                value={field.state.value}
-              />
-            </div>
-          )}
-        </form.Field>
+        <form.AppField name="dueDate">
+          {(field) => <field.DateField id="dueDate" label="Due date" />}
+        </form.AppField>
       </div>
 
-      <form.Field name="notes">
+      <form.AppField name="notes">
         {(field) => (
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300" htmlFor="notes">
-              Notes
-            </label>
-            <textarea
-              className="min-h-20 resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-950 transition outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-cyan-300"
-              disabled={field.form.state.isSubmitting}
-              id="notes"
-              name={field.name}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Optional notes..."
-              value={field.state.value}
-            />
-          </div>
+          <field.TextArea
+            className="[&>textarea]:min-h-20"
+            id="notes"
+            label="Notes"
+            placeholder="Optional notes..."
+          />
         )}
-      </form.Field>
+      </form.AppField>
 
       <div className="flex justify-end">
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <button
-              className="inline-flex items-center gap-2 rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600 dark:bg-cyan-400 dark:text-zinc-950 dark:hover:bg-cyan-300 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
-              disabled={isSubmitting}
-              type="submit"
-            >
-              {isSubmitting ? (
-                <Loader2 aria-hidden="true" className="animate-spin" size={16} />
-              ) : (
-                <Plus aria-hidden="true" size={16} />
-              )}
-              Add task
-            </button>
-          )}
-        </form.Subscribe>
+        <form.AppForm>
+          <form.SubscribeButton
+            disabled={isPending}
+            icon={<Plus aria-hidden="true" size={16} />}
+            label="Add task"
+            pendingIcon={<Loader2 aria-hidden="true" className="animate-spin" size={16} />}
+          />
+        </form.AppForm>
       </div>
     </form>
   );
 }
 
 function TaskList() {
-  const { data } = useListTasksSuspense();
+  const { data } = api.useListTasksSuspense();
   const tasks = data.data;
 
   if (tasks.length === 0) {

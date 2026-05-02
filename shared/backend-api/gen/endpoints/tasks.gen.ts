@@ -40,8 +40,6 @@ export type createTaskResponseError = createTaskResponse400 & {
   headers: Headers;
 };
 
-export type createTaskResponse = createTaskResponseSuccess | createTaskResponseError;
-
 export const getCreateTaskUrl = () => {
   return `http://localhost:5107/tasks`;
 };
@@ -49,7 +47,7 @@ export const getCreateTaskUrl = () => {
 export const createTask = async (
   createTaskRequest: CreateTaskRequest,
   options?: RequestInit,
-): Promise<createTaskResponse> => {
+): Promise<createTaskResponseSuccess> => {
   const res = await fetch(getCreateTaskUrl(), {
     ...options,
     method: "POST",
@@ -59,10 +57,17 @@ export const createTask = async (
 
   const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: createTaskResponseError["data"]; status?: number } =
+      new globalThis.Error();
+    const data: createTaskResponseError["data"] = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
   const parsedBody = body ? (contentType.includes("json") ? JSON.parse(body) : body) : {};
   const data = contentType.includes("json") ? TaskResponse.parse(parsedBody) : parsedBody;
-  return { data, status: res.status, headers: res.headers } as createTaskResponse;
+  return { data, status: res.status, headers: res.headers } as createTaskResponseSuccess;
 };
 
 export const getCreateTaskMutationOptions = <
@@ -139,22 +144,26 @@ export type listTasksResponseSuccess = listTasksResponse200 & {
   headers: Headers;
 };
 
-export type listTasksResponse = listTasksResponseSuccess;
-
 export const getListTasksUrl = () => {
   return `http://localhost:5107/tasks`;
 };
 
-export const listTasks = async (options?: RequestInit): Promise<listTasksResponse> => {
+export const listTasks = async (options?: RequestInit): Promise<listTasksResponseSuccess> => {
   const res = await fetch(getListTasksUrl(), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: listTasksResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listTasksResponse;
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: any; status?: number } = new globalThis.Error();
+    const data = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
+  const data: listTasksResponseSuccess["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listTasksResponseSuccess;
 };
 
 export const getListTasksQueryKey = () => {
@@ -259,13 +268,14 @@ export type getTaskResponseError = getTaskResponse404 & {
   headers: Headers;
 };
 
-export type getTaskResponse = getTaskResponseSuccess | getTaskResponseError;
-
 export const getGetTaskUrl = (id: string) => {
   return `http://localhost:5107/tasks/${id}`;
 };
 
-export const getTask = async (id: string, options?: RequestInit): Promise<getTaskResponse> => {
+export const getTask = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getTaskResponseSuccess> => {
   const res = await fetch(getGetTaskUrl(id), {
     ...options,
     method: "GET",
@@ -273,10 +283,17 @@ export const getTask = async (id: string, options?: RequestInit): Promise<getTas
 
   const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: getTaskResponseError["data"]; status?: number } =
+      new globalThis.Error();
+    const data: getTaskResponseError["data"] = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
   const parsedBody = body ? (contentType.includes("json") ? JSON.parse(body) : body) : {};
   const data = contentType.includes("json") ? TaskResponse.parse(parsedBody) : parsedBody;
-  return { data, status: res.status, headers: res.headers } as getTaskResponse;
+  return { data, status: res.status, headers: res.headers } as getTaskResponseSuccess;
 };
 
 export const getGetTaskQueryKey = (id: string) => {

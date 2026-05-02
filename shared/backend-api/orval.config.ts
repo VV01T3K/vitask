@@ -20,6 +20,7 @@ export default defineConfig({
       formatter: "oxfmt",
       override: {
         fetch: {
+          forceSuccessResponse: true,
           runtimeValidation: true,
         },
         query: {

@@ -2,7 +2,7 @@
 
 use vpr (pnpm under the hood)
 
-Never touch staged files
+Never change staged state
 
 - Check everything:
 
