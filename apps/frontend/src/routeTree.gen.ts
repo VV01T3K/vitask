@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VitaskRouteImport } from './routes/vitask'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FormSimpleRouteImport } from './routes/form.simple'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const VitaskRoute = VitaskRouteImport.update({
+  id: '/vitask',
+  path: '/vitask',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/tasks': typeof TasksRoute
+  '/vitask': typeof VitaskRoute
   '/api/chat': typeof ApiChatRoute
   '/form/simple': typeof FormSimpleRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/tasks': typeof TasksRoute
+  '/vitask': typeof VitaskRoute
   '/api/chat': typeof ApiChatRoute
   '/form/simple': typeof FormSimpleRoute
 }
@@ -60,27 +68,43 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/tasks': typeof TasksRoute
+  '/vitask': typeof VitaskRoute
   '/api/chat': typeof ApiChatRoute
   '/form/simple': typeof FormSimpleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ai' | '/tasks' | '/api/chat' | '/form/simple'
+  fullPaths: '/' | '/ai' | '/tasks' | '/vitask' | '/api/chat' | '/form/simple'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ai' | '/tasks' | '/api/chat' | '/form/simple'
-  id: '__root__' | '/' | '/ai' | '/tasks' | '/api/chat' | '/form/simple'
+  to: '/' | '/ai' | '/tasks' | '/vitask' | '/api/chat' | '/form/simple'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai'
+    | '/tasks'
+    | '/vitask'
+    | '/api/chat'
+    | '/form/simple'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiRoute: typeof AiRoute
   TasksRoute: typeof TasksRoute
+  VitaskRoute: typeof VitaskRoute
   ApiChatRoute: typeof ApiChatRoute
   FormSimpleRoute: typeof FormSimpleRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vitask': {
+      id: '/vitask'
+      path: '/vitask'
+      fullPath: '/vitask'
+      preLoaderRoute: typeof VitaskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tasks': {
       id: '/tasks'
       path: '/tasks'
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiRoute: AiRoute,
   TasksRoute: TasksRoute,
+  VitaskRoute: VitaskRoute,
   ApiChatRoute: ApiChatRoute,
   FormSimpleRoute: FormSimpleRoute,
 }

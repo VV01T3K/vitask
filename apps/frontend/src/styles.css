@@ -11,3 +11,55 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 }
+
+@theme {
+  --font-vitask-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-vitask-body: "Geist", "Inter", system-ui, -apple-system, sans-serif;
+
+  --color-vitask-bg: #0f0f11;
+  --color-vitask-surface: #1a1a1f;
+  --color-vitask-elevated: #24242c;
+  --color-vitask-border: #34343f;
+  --color-vitask-border-bright: #4a4a5c;
+  --color-vitask-text-primary: #f1f1f7;
+  --color-vitask-text-secondary: #a8a8bd;
+  --color-vitask-text-tertiary: #7a7a90;
+  --color-vitask-accent: #8aa5ff;
+  --color-vitask-green: #6ee7a0;
+  --color-vitask-amber: #fcc445;
+  --color-vitask-coral: #fb8a8a;
+  --color-vitask-teal: #4fe3cf;
+
+  --animate-vitask-pulse-border: vitaskPulseBorder 1.6s ease-in-out infinite;
+  --animate-vitask-blink: vitaskBlink 1s steps(2) infinite;
+}
+
+@keyframes vitaskPulseBorder {
+  0%,
+  100% {
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-vitask-amber) 18%, transparent);
+    border-color: color-mix(in srgb, var(--color-vitask-amber) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-vitask-amber) 38%, transparent);
+    border-color: var(--color-vitask-amber);
+  }
+}
+
+@keyframes vitaskBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .vitask-surface {
+    background-color: var(--color-vitask-bg);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.045) 1px, transparent 0),
+      repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 8px);
+    background-size:
+      22px 22px,
+      auto;
+  }
+}
