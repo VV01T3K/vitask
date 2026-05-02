@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { useAppForm } from "#/integrations/tanstack/form";
 
-export const Route = createFileRoute("/tasks")({
+export const Route = createFileRoute("/demo/tasks")({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(api.getListTasksSuspenseQueryOptions()),
   component: TasksRoute,
@@ -51,7 +51,7 @@ const taskFormSchema = z
   .pipe(model.CreateTaskRequest);
 
 function CreateTaskForm() {
-  const { queryClient } = useRouteContext({ from: "/tasks" });
+  const { queryClient } = useRouteContext({ from: "/demo/tasks" });
   const { isPending, mutate } = api.useCreateTask();
 
   const form = useAppForm({
@@ -159,7 +159,7 @@ function TaskList() {
 }
 
 function TaskListItem({ task }: { task: model.TaskResponse }) {
-  const { queryClient } = useRouteContext({ from: "/tasks" });
+  const { queryClient } = useRouteContext({ from: "/demo/tasks" });
   const { isPending, mutate } = api.useDeleteTask();
 
   return (

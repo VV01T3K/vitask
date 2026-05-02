@@ -1,37 +1,67 @@
 @import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
-:root {
-  color-scheme: light dark;
+@theme inline {
+  --font-vitask-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --font-vitask-body: "Geist Variable", "Inter", system-ui, -apple-system, sans-serif;
+
+  --color-vitask-bg: var(--vitask-bg);
+  --color-vitask-surface: var(--vitask-surface);
+  --color-vitask-elevated: var(--vitask-elevated);
+  --color-vitask-border: var(--vitask-border);
+  --color-vitask-border-bright: var(--vitask-border-bright);
+  --color-vitask-text-primary: var(--vitask-text-primary);
+  --color-vitask-text-secondary: var(--vitask-text-secondary);
+  --color-vitask-text-tertiary: var(--vitask-text-tertiary);
+  --color-vitask-accent: var(--vitask-accent);
+  --color-vitask-green: var(--vitask-green);
+  --color-vitask-amber: var(--vitask-amber);
+  --color-vitask-coral: var(--vitask-coral);
+  --color-vitask-teal: var(--vitask-teal);
+
+  --animate-vitask-pulse-border: vitaskPulseBorder 1.6s ease-in-out infinite;
+  --animate-vitask-blink: vitaskBlink 1s steps(2) infinite;
 }
 
-:root[data-theme="light"] {
+:root {
   color-scheme: light;
+
+  --vitask-bg: oklch(98.5% 0 0);
+  --vitask-surface: oklch(97% 0.001 286.375);
+  --vitask-elevated: oklch(92% 0.004 286.32);
+  --vitask-border: oklch(87.1% 0.006 286.286);
+  --vitask-border-bright: oklch(70.5% 0.015 286.067);
+  --vitask-text-primary: oklch(21% 0.006 285.885);
+  --vitask-text-secondary: oklch(37% 0.013 285.805);
+  --vitask-text-tertiary: oklch(55.2% 0.016 285.938);
+  --vitask-accent: oklch(62.3% 0.214 259.815);
+  --vitask-green: oklch(69.6% 0.17 162.48);
+  --vitask-amber: oklch(76.9% 0.188 70.08);
+  --vitask-coral: oklch(70.4% 0.191 22.216);
+  --vitask-teal: oklch(70.4% 0.14 182.503);
+  --vitask-grid-dot: rgba(24, 24, 27, 0.06);
+  --vitask-grid-line: rgba(24, 24, 27, 0.035);
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-}
 
-@theme {
-  --font-vitask-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-vitask-body: "Geist", "Inter", system-ui, -apple-system, sans-serif;
-
-  --color-vitask-bg: #0f0f11;
-  --color-vitask-surface: #1a1a1f;
-  --color-vitask-elevated: #24242c;
-  --color-vitask-border: #34343f;
-  --color-vitask-border-bright: #4a4a5c;
-  --color-vitask-text-primary: #f1f1f7;
-  --color-vitask-text-secondary: #a8a8bd;
-  --color-vitask-text-tertiary: #7a7a90;
-  --color-vitask-accent: #8aa5ff;
-  --color-vitask-green: #6ee7a0;
-  --color-vitask-amber: #fcc445;
-  --color-vitask-coral: #fb8a8a;
-  --color-vitask-teal: #4fe3cf;
-
-  --animate-vitask-pulse-border: vitaskPulseBorder 1.6s ease-in-out infinite;
-  --animate-vitask-blink: vitaskBlink 1s steps(2) infinite;
+  --vitask-bg: oklch(14.1% 0.005 285.823);
+  --vitask-surface: oklch(21% 0.006 285.885);
+  --vitask-elevated: oklch(27.4% 0.006 286.033);
+  --vitask-border: oklch(37% 0.013 285.805);
+  --vitask-border-bright: oklch(44.2% 0.017 285.786);
+  --vitask-text-primary: oklch(96.7% 0.001 286.375);
+  --vitask-text-secondary: oklch(70.5% 0.015 286.067);
+  --vitask-text-tertiary: oklch(55.2% 0.016 285.938);
+  --vitask-accent: oklch(78.5% 0.115 274.713);
+  --vitask-green: oklch(84.5% 0.143 164.978);
+  --vitask-amber: oklch(87.9% 0.169 91.605);
+  --vitask-coral: oklch(80.8% 0.114 19.571);
+  --vitask-teal: oklch(85.5% 0.138 181.071);
+  --vitask-grid-dot: rgba(255, 255, 255, 0.045);
+  --vitask-grid-line: rgba(255, 255, 255, 0.014);
 }
 
 @keyframes vitaskPulseBorder {
@@ -56,8 +86,8 @@
   .vitask-surface {
     background-color: var(--color-vitask-bg);
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.045) 1px, transparent 0),
-      repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 8px);
+      radial-gradient(circle at 1px 1px, var(--vitask-grid-dot) 1px, transparent 0),
+      repeating-linear-gradient(135deg, var(--vitask-grid-line) 0 1px, transparent 1px 8px);
     background-size:
       22px 22px,
       auto;

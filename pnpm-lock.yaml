@@ -9,6 +9,12 @@ catalogs:
     '@durable-streams/server':
       specifier: ^0.3.1
       version: 0.3.1
+    '@fontsource-variable/geist':
+      specifier: ^5.2.8
+      version: 5.2.8
+    '@fontsource-variable/geist-mono':
+      specifier: ^5.2.7
+      version: 5.2.7
     '@types/node':
       specifier: ^24
       version: 24.12.2
@@ -44,6 +50,12 @@ importers:
       '@durable-streams/tanstack-ai-transport':
         specifier: ^0.0.4
         version: 0.0.4
+      '@fontsource-variable/geist':
+        specifier: 'catalog:'
+        version: 5.2.8
+      '@fontsource-variable/geist-mono':
+        specifier: 'catalog:'
+        version: 5.2.7
       '@tailwindcss/vite':
         specifier: ^4.2.4
         version: 4.2.4(@voidzero-dev/vite-plus-core@0.1.20(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3))
@@ -512,6 +524,12 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource-variable/geist-mono@5.2.7':
+    resolution: {integrity: sha512-ZKlZ5sjtalb2TwXKs400mAGDlt/+2ENLNySPx0wTz3bP3mWARCsUW+rpxzZc7e05d2qGch70pItt3K4qttbIYA==}
+
+  '@fontsource-variable/geist@5.2.8':
+    resolution: {integrity: sha512-cJ6m9e+8MQ5dCYJsLylfZrgBh6KkG4bOLckB35Tr9J/EqdkEM6QllH5PxqP1dhTvFup+HtMRPuz9xOjxXJggxw==}
 
   '@gerrit0/mini-shiki@3.23.0':
     resolution: {integrity: sha512-bEMORlG0cqdjVyCEuU0cDQbORWX+kYCeo0kV1lbxF5bt4r7SID2l9bqsxJEM0zndaxpOUT7riCyIVEuqq/Ynxg==}
@@ -3613,6 +3631,10 @@ snapshots:
 
   '@exodus/bytes@1.15.0':
     optional: true
+
+  '@fontsource-variable/geist-mono@5.2.7': {}
+
+  '@fontsource-variable/geist@5.2.8': {}
 
   '@gerrit0/mini-shiki@3.23.0':
     dependencies:

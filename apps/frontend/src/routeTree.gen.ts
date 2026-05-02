@@ -9,36 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VitaskRouteImport } from './routes/vitask'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as AiRouteImport } from './routes/ai'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FormSimpleRouteImport } from './routes/form.simple'
+import { Route as DemoTasksRouteImport } from './routes/demo.tasks'
+import { Route as DemoAiRouteImport } from './routes/demo.ai'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
-const VitaskRoute = VitaskRouteImport.update({
-  id: '/vitask',
-  path: '/vitask',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AiRoute = AiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FormSimpleRoute = FormSimpleRouteImport.update({
-  id: '/form/simple',
-  path: '/form/simple',
+const DemoTasksRoute = DemoTasksRouteImport.update({
+  id: '/demo/tasks',
+  path: '/demo/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoAiRoute = DemoAiRouteImport.update({
+  id: '/demo/ai',
+  path: '/demo/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -49,76 +37,40 @@ const ApiChatRoute = ApiChatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/ai': typeof AiRoute
-  '/tasks': typeof TasksRoute
-  '/vitask': typeof VitaskRoute
   '/api/chat': typeof ApiChatRoute
-  '/form/simple': typeof FormSimpleRoute
+  '/demo/ai': typeof DemoAiRoute
+  '/demo/tasks': typeof DemoTasksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/ai': typeof AiRoute
-  '/tasks': typeof TasksRoute
-  '/vitask': typeof VitaskRoute
   '/api/chat': typeof ApiChatRoute
-  '/form/simple': typeof FormSimpleRoute
+  '/demo/ai': typeof DemoAiRoute
+  '/demo/tasks': typeof DemoTasksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/ai': typeof AiRoute
-  '/tasks': typeof TasksRoute
-  '/vitask': typeof VitaskRoute
   '/api/chat': typeof ApiChatRoute
-  '/form/simple': typeof FormSimpleRoute
+  '/demo/ai': typeof DemoAiRoute
+  '/demo/tasks': typeof DemoTasksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ai' | '/tasks' | '/vitask' | '/api/chat' | '/form/simple'
+  fullPaths: '/' | '/api/chat' | '/demo/ai' | '/demo/tasks'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ai' | '/tasks' | '/vitask' | '/api/chat' | '/form/simple'
-  id:
-    | '__root__'
-    | '/'
-    | '/ai'
-    | '/tasks'
-    | '/vitask'
-    | '/api/chat'
-    | '/form/simple'
+  to: '/' | '/api/chat' | '/demo/ai' | '/demo/tasks'
+  id: '__root__' | '/' | '/api/chat' | '/demo/ai' | '/demo/tasks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AiRoute: typeof AiRoute
-  TasksRoute: typeof TasksRoute
-  VitaskRoute: typeof VitaskRoute
   ApiChatRoute: typeof ApiChatRoute
-  FormSimpleRoute: typeof FormSimpleRoute
+  DemoAiRoute: typeof DemoAiRoute
+  DemoTasksRoute: typeof DemoTasksRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vitask': {
-      id: '/vitask'
-      path: '/vitask'
-      fullPath: '/vitask'
-      preLoaderRoute: typeof VitaskRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai': {
-      id: '/ai'
-      path: '/ai'
-      fullPath: '/ai'
-      preLoaderRoute: typeof AiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -126,11 +78,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/form/simple': {
-      id: '/form/simple'
-      path: '/form/simple'
-      fullPath: '/form/simple'
-      preLoaderRoute: typeof FormSimpleRouteImport
+    '/demo/tasks': {
+      id: '/demo/tasks'
+      path: '/demo/tasks'
+      fullPath: '/demo/tasks'
+      preLoaderRoute: typeof DemoTasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/ai': {
+      id: '/demo/ai'
+      path: '/demo/ai'
+      fullPath: '/demo/ai'
+      preLoaderRoute: typeof DemoAiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -145,11 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AiRoute: AiRoute,
-  TasksRoute: TasksRoute,
-  VitaskRoute: VitaskRoute,
   ApiChatRoute: ApiChatRoute,
-  FormSimpleRoute: FormSimpleRoute,
+  DemoAiRoute: DemoAiRoute,
+  DemoTasksRoute: DemoTasksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

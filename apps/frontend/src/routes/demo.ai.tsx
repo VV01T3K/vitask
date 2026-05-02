@@ -9,7 +9,7 @@ import { getDemoChatSnapshotFn } from "#/integrations/tanstack/ai/chat.functions
 
 const CHAT_ID = "vitask-demo-chat";
 
-export const Route = createFileRoute("/ai")({
+export const Route = createFileRoute("/demo/ai")({
   loader: () => getDemoChatSnapshotFn(),
   component: AiRoute,
 });

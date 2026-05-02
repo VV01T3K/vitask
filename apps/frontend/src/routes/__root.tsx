@@ -4,7 +4,6 @@ import { HeadContent, Link, Scripts, createRootRouteWithContext } from "@tanstac
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "next-themes";
 
-import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { useSuppressLocalDurableStreamWarning } from "../integrations/durable-streams/suppress-no-https-warning";
 import TanStackQueryDevtools from "../integrations/tanstack/query/devtools";
@@ -68,7 +67,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         >
           <Header />
           {children}
-          <Footer />
           <TanStackDevtools
             config={{
               position: "bottom-right",

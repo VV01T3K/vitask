@@ -17,6 +17,8 @@
     "@durable-streams/client": "^0.2.3",
     "@durable-streams/server": "catalog:",
     "@durable-streams/tanstack-ai-transport": "^0.0.4",
+    "@fontsource-variable/geist": "catalog:",
+    "@fontsource-variable/geist-mono": "catalog:",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/ai": "^0.14.0",
     "@tanstack/ai-groq": "^0.1.8",

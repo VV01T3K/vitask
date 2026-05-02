@@ -58,5 +58,7 @@
   "[csharp]": {
     "editor.defaultFormatter": "csharpier.csharpier-vscode"
   },
-  "csharpier.dev.useCustomPath": false
+  "csharpier.dev.useCustomPath": false,
+  "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
+  "css.lint.unknownAtRules": "ignore"
 }
