@@ -1,16 +1,10 @@
-import { DurableStreamTestServer } from "@durable-streams/server";
 import {
   ensureDurableChatSessionStream,
   materializeSnapshotFromDurableStream,
 } from "@durable-streams/tanstack-ai-transport";
 import type { UIMessage } from "@tanstack/ai";
 
-const DURABLE_STREAM_HOST = "127.0.0.1";
-const DURABLE_STREAM_PORT = 4437;
-
-declare global {
-  var vitaskDurableStreamServerUrl: Promise<string> | undefined;
-}
+import { getDurableStreamServerUrl } from "./stream-server.server";
 
 export async function getDemoChatSnapshot(): Promise<{
   messages: Array<UIMessage>;
@@ -69,24 +63,4 @@ async function ensureDemoChatStream(): Promise<string> {
 async function getDemoChatStreamUrl(): Promise<string> {
   const serverUrl = await getDurableStreamServerUrl();
   return `${serverUrl}/v1/stream/${encodeURIComponent("vitask-demo-chat")}`;
-}
-
-async function getDurableStreamServerUrl(): Promise<string> {
-  if (!globalThis.vitaskDurableStreamServerUrl) {
-    globalThis.vitaskDurableStreamServerUrl = startDurableStreamServer().catch((error: unknown) => {
-      globalThis.vitaskDurableStreamServerUrl = undefined;
-      throw error;
-    });
-  }
-
-  return globalThis.vitaskDurableStreamServerUrl;
-}
-
-async function startDurableStreamServer(): Promise<string> {
-  const server = new DurableStreamTestServer({
-    host: DURABLE_STREAM_HOST,
-    port: DURABLE_STREAM_PORT,
-  });
-
-  return server.start();
 }

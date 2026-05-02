@@ -1,2 +1,2 @@
-export * as api from "./gen/endpoints/tasks.gen";
+export * as api from "./endpoints";
 export * as model from "./gen/model";

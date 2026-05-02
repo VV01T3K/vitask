@@ -2,7 +2,8 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { HeadContent, Link, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
+import { Toaster } from "sonner";
 
 import Header from "../components/Header";
 import { useSuppressLocalDurableStreamWarning } from "../integrations/durable-streams/suppress-no-https-warning";
@@ -25,7 +26,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Vitask",
       },
     ],
     links: [
@@ -67,6 +68,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         >
           <Header />
           {children}
+          <AppToaster />
           <TanStackDevtools
             config={{
               position: "bottom-right",
@@ -83,5 +85,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function AppToaster() {
+  const { resolvedTheme } = useTheme();
+
+  return (
+    <Toaster
+      duration={5000}
+      mobileOffset={{ top: 72, left: 16, right: 16 }}
+      offset={{ top: 80, right: 24 }}
+      position="top-right"
+      theme={resolvedTheme === "dark" ? "dark" : "light"}
+      toastOptions={{
+        classNames: {
+          toast: "vitask-sonner-toast",
+        },
+        unstyled: true,
+      }}
+      visibleToasts={4}
+    />
   );
 }

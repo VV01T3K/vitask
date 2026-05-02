@@ -50,7 +50,7 @@ export const Route = createFileRoute("/api/chat")({
           adapter: createGroqText(GROQ_MODEL, apiKey),
           messages,
           systemPrompts: [
-            "You are a concise, helpful assistant. Answer clearly and keep responses easy to scan.",
+            "You are Vitask's assistant. Answer concisely, be practical, and help with focused work, timers, and session wrap-ups.",
           ],
           abortController,
         });

@@ -9,12 +9,8 @@ import { z as zod } from "zod";
 export const createTaskBodyTitleMin = 3;
 export const createTaskBodyTitleMax = 120;
 
-export const createTaskBodyNotesMax = 1000;
-
 export const CreateTaskBody = zod.object({
   title: zod.string().min(createTaskBodyTitleMin).max(createTaskBodyTitleMax),
-  notes: zod.string().max(createTaskBodyNotesMax).nullish(),
-  dueDate: zod.iso.date().nullish(),
 });
 
 export type CreateTaskBody = zod.input<typeof CreateTaskBody>;

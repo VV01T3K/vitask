@@ -52,5 +52,6 @@ app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);
 
 app.MapTaskEndpoints();
+app.MapTimerEndpoints();
 
 app.Run();

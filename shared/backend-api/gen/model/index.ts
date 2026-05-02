@@ -7,5 +7,10 @@
 
 export * from "./createTaskBody.zod";
 export * from "./createTaskRequest.zod";
+export * from "./createTimerBody.zod";
+export * from "./createTimerRequest.zod";
 export * from "./httpValidationProblemDetails.zod";
+export * from "./setTaskCompletionBody.zod";
+export * from "./setTaskCompletionRequest.zod";
 export * from "./taskResponse.zod";
+export * from "./timerResponse.zod";

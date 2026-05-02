@@ -1,81 +1,54 @@
-export type ActiveTask = {
-  id: string;
-  status: "active";
-  title: string;
+import type { model } from "@vitask/backend-api";
+
+type TimerResponse = model.TimerResponse;
+
+export type Runtime = {
+  nextFireAt: number;
+  firing: boolean;
+  message: string | null;
+  sweeping?: boolean;
 };
 
-export type CompletedTask = {
-  id: string;
-  status: "completed";
-  title: string;
-  completedAgo: string;
-  hype: string;
-};
+export type Runtimes = Record<string, Runtime>;
 
-export type Task = ActiveTask | CompletedTask;
+export function durationSeconds(timer: Pick<TimerResponse, "durationSeconds">): number {
+  return Number(timer.durationSeconds);
+}
 
-export type RunningTimer = {
-  id: string;
-  status: "running";
-  icon: "droplet";
-  title: string;
-  description: string;
-  countdown: string;
-  progressPct: number;
-  accent: string;
-  isDefault?: boolean;
-};
+export function createRuntime(
+  timerDurationSeconds: number,
+  remainingSeconds = timerDurationSeconds,
+): Runtime {
+  const now = Date.now();
 
-export type FiringTimer = {
-  id: string;
-  status: "firing";
-  icon: "eye";
-  title: string;
-  description: string;
-  aiMessage: string;
-  isDefault?: boolean;
-};
+  return {
+    nextFireAt: now + remainingSeconds * 1000,
+    firing: false,
+    message: null,
+  };
+}
 
-export type Timer = RunningTimer | FiringTimer;
+export function getRemainingSeconds(
+  runtime: Runtime | undefined,
+  timerDurationSeconds: number,
+  now: number,
+) {
+  if (!runtime) return timerDurationSeconds;
+  if (runtime.firing) return 0;
 
-export const activeTasks: ActiveTask[] = [
-  { id: "t1", status: "active", title: "Refactor auth middleware to use new token shape" },
-  { id: "t2", status: "active", title: "Write integration tests for /api/wrap-up" },
-];
+  return Math.max(0, Math.ceil((runtime.nextFireAt - now) / 1000));
+}
 
-export const completedTasks: CompletedTask[] = [
-  {
-    id: "t0",
-    status: "completed",
-    title: "Fix navbar CSS alignment",
-    completedAgo: "14 min ago",
-    hype: "Done. Crushed. Demolished. Somewhere a project manager just felt a tingle of joy and didn't know why.",
-  },
-];
+export function syncRuntimesWithTimers(
+  previous: Runtimes,
+  timers: Array<Pick<TimerResponse, "id" | "durationSeconds">>,
+): Runtimes {
+  const next: Runtimes = {};
 
-export const runningTimers: RunningTimer[] = [
-  {
-    id: "timer-hydration",
-    status: "running",
-    icon: "droplet",
-    title: "Hydration",
-    description: "Drink some water",
-    countdown: "22:13",
-    progressPct: 63,
-    accent: "var(--color-vitask-accent)",
-    isDefault: true,
-  },
-];
+  for (const timer of timers) {
+    const current = previous[timer.id];
+    next[timer.id] = current ?? createRuntime(durationSeconds(timer));
+  }
 
-export const firingTimers: FiringTimer[] = [
-  {
-    id: "timer-eye-rest",
-    status: "firing",
-    icon: "eye",
-    title: "Eye Rest (20-20-20)",
-    description: "Look 20 feet away for 20 seconds",
-    aiMessage:
-      "Look 20 feet away for 20 seconds. You've completed solid work; eyes deserve the rest.",
-    isDefault: true,
-  },
-];
+  return next;
+}

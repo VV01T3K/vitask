@@ -9,8 +9,9 @@ import { z as zod } from "zod";
 export const TaskResponse = zod.object({
   id: zod.uuid(),
   title: zod.string(),
-  notes: zod.string().nullable(),
-  dueDate: zod.iso.date().nullable(),
+  isCompleted: zod.boolean(),
+  completedAt: zod.iso.datetime({ offset: true }).nullable(),
+  createdAt: zod.iso.datetime({ offset: true }),
 });
 
 export type TaskResponse = zod.input<typeof TaskResponse>;

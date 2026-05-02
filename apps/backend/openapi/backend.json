@@ -128,6 +128,114 @@
           }
         }
       }
+    },
+    "/tasks/{id}/completion": {
+      "put": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Set task completion",
+        "operationId": "SetTaskCompletion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTaskCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/timers": {
+      "post": {
+        "tags": [
+          "Timers"
+        ],
+        "summary": "Create a timer",
+        "operationId": "CreateTimer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTimerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Timers"
+        ],
+        "summary": "List timers",
+        "operationId": "ListTimers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimerResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -142,20 +250,41 @@
             "maxLength": 120,
             "minLength": 3,
             "type": "string"
+          }
+        }
+      },
+      "CreateTimerRequest": {
+        "required": [
+          "title",
+          "description",
+          "aiInstructions"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 120,
+            "minLength": 2,
+            "type": "string"
           },
-          "notes": {
-            "maxLength": 1000,
-            "type": [
-              "null",
-              "string"
-            ]
+          "description": {
+            "maxLength": 240,
+            "minLength": 1,
+            "type": "string"
           },
-          "dueDate": {
+          "durationSeconds": {
+            "maximum": 86400,
+            "minimum": 60,
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
-              "null",
+              "integer",
               "string"
             ],
-            "format": "date"
+            "format": "int32"
+          },
+          "aiInstructions": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
           }
         }
       },
@@ -206,12 +335,21 @@
           }
         }
       },
+      "SetTaskCompletionRequest": {
+        "type": "object",
+        "properties": {
+          "isCompleted": {
+            "type": "boolean"
+          }
+        }
+      },
       "TaskResponse": {
         "required": [
           "id",
           "title",
-          "notes",
-          "dueDate"
+          "isCompleted",
+          "completedAt",
+          "createdAt"
         ],
         "type": "object",
         "properties": {
@@ -222,18 +360,61 @@
           "title": {
             "type": "string"
           },
-          "notes": {
-            "type": [
-              "null",
-              "string"
-            ]
+          "isCompleted": {
+            "type": "boolean"
           },
-          "dueDate": {
+          "completedAt": {
             "type": [
               "null",
               "string"
             ],
-            "format": "date"
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TimerResponse": {
+        "required": [
+          "id",
+          "title",
+          "description",
+          "durationSeconds",
+          "aiInstructions",
+          "isDefault",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationSeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "aiInstructions": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }
@@ -242,6 +423,9 @@
   "tags": [
     {
       "name": "Tasks"
+    },
+    {
+      "name": "Timers"
     }
   ]
 }

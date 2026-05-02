@@ -6,21 +6,32 @@ namespace backend;
 public record CreateTaskRequest
 {
     public string? Title { get; init; }
-
-    public string? Notes { get; init; }
-
-    public DateOnly? DueDate { get; init; }
 }
 
-public record TaskResponse(Guid Id, string Title, string? Notes, DateOnly? DueDate);
+public record SetTaskCompletionRequest
+{
+    public bool IsCompleted { get; init; }
+}
+
+public record TaskResponse(
+    Guid Id,
+    string Title,
+    bool IsCompleted,
+    DateTimeOffset? CompletedAt,
+    DateTimeOffset CreatedAt
+);
 
 public sealed class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
 {
     public CreateTaskRequestValidator()
     {
         RuleFor(task => task.Title).NotEmpty().Length(3, 120);
-        RuleFor(task => task.Notes).MaximumLength(1_000);
     }
+}
+
+public sealed class SetTaskCompletionRequestValidator : AbstractValidator<SetTaskCompletionRequest>
+{
+    public SetTaskCompletionRequestValidator() { }
 }
 
 public static class TaskEndpoints
@@ -42,8 +53,9 @@ public static class TaskEndpoints
                     {
                         Id = Guid.NewGuid(),
                         Title = request.Title!.Trim(),
-                        Notes = request.Notes?.Trim(),
-                        DueDate = request.DueDate,
+                        IsCompleted = false,
+                        CompletedAt = null,
+                        CreatedAt = DateTimeOffset.UtcNow,
                     };
 
                     dbContext.Tasks.Add(task);
@@ -65,17 +77,16 @@ public static class TaskEndpoints
                 "",
                 async (VitaskDbContext dbContext, CancellationToken cancellationToken) =>
                 {
-                    return await dbContext
+                    var taskRows = await dbContext
                         .Tasks.AsNoTracking()
-                        .OrderBy(task => task.Title)
-                        .ThenBy(task => task.Id)
-                        .Select(task => new TaskResponse(
-                            task.Id,
-                            task.Title,
-                            task.Notes,
-                            task.DueDate
-                        ))
+                        .Select(task => task.ToResponse())
                         .ToArrayAsync(cancellationToken);
+
+                    return taskRows
+                        .OrderBy(task => task.IsCompleted)
+                        .ThenByDescending(task => task.CreatedAt)
+                        .ThenBy(task => task.Id)
+                        .ToArray();
                 }
             )
             .WithName("ListTasks")
@@ -94,12 +105,7 @@ public static class TaskEndpoints
                     var task = await dbContext
                         .Tasks.AsNoTracking()
                         .Where(task => task.Id == id)
-                        .Select(task => new TaskResponse(
-                            task.Id,
-                            task.Title,
-                            task.Notes,
-                            task.DueDate
-                        ))
+                        .Select(task => task.ToResponse())
                         .FirstOrDefaultAsync(cancellationToken);
 
                     return task is null ? TypedResults.NotFound() : TypedResults.Ok(task);
@@ -107,6 +113,39 @@ public static class TaskEndpoints
             )
             .WithName("GetTask")
             .WithSummary("Get a task")
+            .Produces<TaskResponse>()
+            .Produces(StatusCodes.Status404NotFound);
+
+        tasks
+            .MapPut(
+                "/{id:guid}/completion",
+                async Task<IResult> (
+                    Guid id,
+                    SetTaskCompletionRequest request,
+                    VitaskDbContext dbContext,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    var task = await dbContext.Tasks.FirstOrDefaultAsync(
+                        task => task.Id == id,
+                        cancellationToken
+                    );
+                    if (task is null)
+                    {
+                        return TypedResults.NotFound();
+                    }
+
+                    task.IsCompleted = request.IsCompleted;
+                    task.CompletedAt = request.IsCompleted ? DateTimeOffset.UtcNow : null;
+
+                    await dbContext.SaveChangesAsync(cancellationToken);
+
+                    return TypedResults.Ok(task.ToResponse());
+                }
+            )
+            .WithName("SetTaskCompletion")
+            .WithSummary("Set task completion")
+            .WithFluentValidation<SetTaskCompletionRequest>()
             .Produces<TaskResponse>()
             .Produces(StatusCodes.Status404NotFound);
 
@@ -136,7 +175,13 @@ public static class TaskEndpoints
 
     private static TaskResponse ToResponse(this TaskItem task)
     {
-        return new TaskResponse(task.Id, task.Title, task.Notes, task.DueDate);
+        return new TaskResponse(
+            task.Id,
+            task.Title,
+            task.IsCompleted,
+            task.CompletedAt,
+            task.CreatedAt
+        );
     }
 }
 

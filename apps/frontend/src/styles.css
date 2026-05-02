@@ -21,27 +21,31 @@
   --color-vitask-teal: var(--vitask-teal);
 
   --animate-vitask-pulse-border: vitaskPulseBorder 1.6s ease-in-out infinite;
+  --animate-vitask-alarm-ring: vitaskAlarmRing 1s ease-in-out infinite;
   --animate-vitask-blink: vitaskBlink 1s steps(2) infinite;
+  --animate-vitask-bounce: vitaskBounce 0.32s ease-out;
+  --animate-vitask-slide-in-top: vitaskSlideInTop 0.3s ease-out;
 }
 
 :root {
   color-scheme: light;
 
-  --vitask-bg: oklch(98.5% 0 0);
-  --vitask-surface: oklch(97% 0.001 286.375);
-  --vitask-elevated: oklch(92% 0.004 286.32);
-  --vitask-border: oklch(87.1% 0.006 286.286);
-  --vitask-border-bright: oklch(70.5% 0.015 286.067);
-  --vitask-text-primary: oklch(21% 0.006 285.885);
-  --vitask-text-secondary: oklch(37% 0.013 285.805);
-  --vitask-text-tertiary: oklch(55.2% 0.016 285.938);
-  --vitask-accent: oklch(62.3% 0.214 259.815);
-  --vitask-green: oklch(69.6% 0.17 162.48);
-  --vitask-amber: oklch(76.9% 0.188 70.08);
-  --vitask-coral: oklch(70.4% 0.191 22.216);
-  --vitask-teal: oklch(70.4% 0.14 182.503);
-  --vitask-grid-dot: rgba(24, 24, 27, 0.06);
-  --vitask-grid-line: rgba(24, 24, 27, 0.035);
+  --vitask-bg: oklch(97.3% 0.003 106.4);
+  --vitask-surface: oklch(100% 0 0);
+  --vitask-elevated: oklch(94.8% 0.005 106.5);
+  --vitask-border: oklch(88.1% 0.008 106.6);
+  --vitask-border-bright: oklch(78% 0.011 106.7);
+  --vitask-text-primary: oklch(19.8% 0.01 285.5);
+  --vitask-text-secondary: oklch(44.6% 0.033 285);
+  --vitask-text-tertiary: oklch(54.5% 0.028 285.4);
+  --vitask-accent: oklch(52.6% 0.199 268);
+  --vitask-green: oklch(62.7% 0.17 149.2);
+  --vitask-amber: oklch(55.5% 0.146 49);
+  --vitask-coral: oklch(57.7% 0.215 27.3);
+  --vitask-teal: oklch(60% 0.104 184.7);
+  --vitask-grid-dot: oklch(19.8% 0.01 285.5 / 0.06);
+  --vitask-grid-line: oklch(19.8% 0.01 285.5 / 0.022);
+  --vitask-backdrop: oklch(19.8% 0.01 285.5 / 0.35);
 }
 
 :root[data-theme="dark"] {
@@ -62,6 +66,7 @@
   --vitask-teal: oklch(85.5% 0.138 181.071);
   --vitask-grid-dot: rgba(255, 255, 255, 0.045);
   --vitask-grid-line: rgba(255, 255, 255, 0.014);
+  --vitask-backdrop: rgba(0, 0, 0, 0.7);
 }
 
 @keyframes vitaskPulseBorder {
@@ -82,7 +87,134 @@
   }
 }
 
+@keyframes vitaskAlarmRing {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--color-vitask-coral) 18%, transparent),
+      0 0 16px color-mix(in srgb, var(--color-vitask-coral) 30%, transparent);
+    border-color: color-mix(in srgb, var(--color-vitask-coral) 75%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px color-mix(in srgb, var(--color-vitask-coral) 0%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-vitask-coral) 48%, transparent);
+    border-color: var(--color-vitask-coral);
+  }
+}
+
+@keyframes vitaskBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes vitaskSlideInTop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vitaskParticleFly {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes vitaskTimerParticleFly {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes vitaskStrike {
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes vitaskProgressSweep {
+  0% {
+    width: 100%;
+    opacity: 1;
+  }
+  60% {
+    width: 0%;
+    opacity: 0.6;
+  }
+  100% {
+    width: 0%;
+    opacity: 1;
+  }
+}
+
+@keyframes vitaskFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vitaskModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vitaskWrapModalIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 @layer utilities {
+  .theme-toggle-sun {
+    display: block;
+  }
+
+  .theme-toggle-moon {
+    display: none;
+  }
+
+  :root[data-theme="dark"] .theme-toggle-sun {
+    display: none;
+  }
+
+  :root[data-theme="dark"] .theme-toggle-moon {
+    display: block;
+  }
+
   .vitask-surface {
     background-color: var(--color-vitask-bg);
     background-image:
@@ -91,5 +223,110 @@
     background-size:
       22px 22px,
       auto;
+  }
+
+  .vitask-particle {
+    transform: translate(-50%, -50%);
+    animation: vitaskParticleFly 0.65s ease-out forwards;
+  }
+
+  .vitask-timer-particle {
+    animation: vitaskTimerParticleFly 0.85s ease-out forwards;
+  }
+
+  .vitask-strike::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 1px;
+    width: 0;
+    background: currentColor;
+    animation: vitaskStrike 200ms ease-out forwards;
+  }
+
+  .vitask-progress-sweep {
+    animation: vitaskProgressSweep 0.6s ease-out;
+  }
+
+  .vitask-alarm-ring {
+    animation: vitaskAlarmRing 1s ease-in-out infinite;
+  }
+
+  .vitask-modal-backdrop {
+    animation: vitaskFadeIn 0.18s ease-out;
+  }
+
+  .vitask-modal-in {
+    animation: vitaskModalIn 0.18s ease-out;
+  }
+
+  .vitask-wrap-modal-in {
+    animation: vitaskWrapModalIn 0.24s ease-out;
+  }
+
+  .vitask-sonner-toast {
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .vitask-hype-toast {
+    width: min(22rem, calc(100vw - 2rem));
+    border: 1px solid var(--color-vitask-border-bright);
+    border-radius: 0.5rem;
+    background: var(--color-vitask-surface);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.28),
+      0 1px 4px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+
+  .vitask-hype-toast-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 0.875rem;
+  }
+
+  .vitask-hype-toast-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .vitask-hype-toast-close {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.125rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-vitask-text-tertiary);
+    border-radius: 0.25rem;
+    transition: color 0.15s;
+  }
+
+  .vitask-hype-toast-close:hover {
+    color: var(--color-vitask-text-primary);
+  }
+
+  .vitask-hype-toast-progress {
+    height: 2px;
+    background: color-mix(in srgb, var(--color-vitask-teal) 60%, transparent);
+    transform-origin: left;
+    animation: vitaskToastProgress 5s linear forwards;
+  }
+
+  @keyframes vitaskToastProgress {
+    from {
+      transform: scaleX(1);
+    }
+    to {
+      transform: scaleX(0);
+    }
   }
 }

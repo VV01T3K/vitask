@@ -18,7 +18,11 @@ import type {
 } from "@tanstack/react-query";
 
 import { TaskResponse } from "../model";
-import type { CreateTaskRequest, HttpValidationProblemDetails } from "../model";
+import type {
+  CreateTaskRequest,
+  HttpValidationProblemDetails,
+  SetTaskCompletionRequest,
+} from "../model";
 
 /**
  * @summary Create a task
@@ -471,4 +475,118 @@ export const useDeleteTask = <TError = void, TContext = unknown>(
   queryClient?: QueryClient,
 ): UseMutationResult<Awaited<ReturnType<typeof deleteTask>>, TError, { id: string }, TContext> => {
   return useMutation(getDeleteTaskMutationOptions(options), queryClient);
+};
+/**
+ * @summary Set task completion
+ */
+export type setTaskCompletionResponse200 = {
+  data: TaskResponse;
+  status: 200;
+};
+
+export type setTaskCompletionResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type setTaskCompletionResponseSuccess = setTaskCompletionResponse200 & {
+  headers: Headers;
+};
+export type setTaskCompletionResponseError = setTaskCompletionResponse404 & {
+  headers: Headers;
+};
+
+export const getSetTaskCompletionUrl = (id: string) => {
+  return `http://localhost:5107/tasks/${id}/completion`;
+};
+
+export const setTaskCompletion = async (
+  id: string,
+  setTaskCompletionRequest: SetTaskCompletionRequest,
+  options?: RequestInit,
+): Promise<setTaskCompletionResponseSuccess> => {
+  const res = await fetch(getSetTaskCompletionUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(setTaskCompletionRequest),
+  });
+
+  const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  if (!res.ok) {
+    const err: globalThis.Error & {
+      info?: setTaskCompletionResponseError["data"];
+      status?: number;
+    } = new globalThis.Error();
+    const data: setTaskCompletionResponseError["data"] = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
+  const parsedBody = body ? (contentType.includes("json") ? JSON.parse(body) : body) : {};
+  const data = contentType.includes("json") ? TaskResponse.parse(parsedBody) : parsedBody;
+  return { data, status: res.status, headers: res.headers } as setTaskCompletionResponseSuccess;
+};
+
+export const getSetTaskCompletionMutationOptions = <TError = void, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setTaskCompletion>>,
+    TError,
+    { id: string; data: SetTaskCompletionRequest },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setTaskCompletion>>,
+  TError,
+  { id: string; data: SetTaskCompletionRequest },
+  TContext
+> => {
+  const mutationKey = ["setTaskCompletion"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setTaskCompletion>>,
+    { id: string; data: SetTaskCompletionRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return setTaskCompletion(id, data, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetTaskCompletionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setTaskCompletion>>
+>;
+export type SetTaskCompletionMutationBody = SetTaskCompletionRequest;
+export type SetTaskCompletionMutationError = void;
+
+/**
+ * @summary Set task completion
+ */
+export const useSetTaskCompletion = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setTaskCompletion>>,
+      TError,
+      { id: string; data: SetTaskCompletionRequest },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setTaskCompletion>>,
+  TError,
+  { id: string; data: SetTaskCompletionRequest },
+  TContext
+> => {
+  return useMutation(getSetTaskCompletionMutationOptions(options), queryClient);
 };
