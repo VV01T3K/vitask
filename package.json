@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vpr -r dev",
+    "dev": "pnpm -r --no-sort dev",
     "check": "vpr -r check",
     "fix": "vpr -r fix",
     "generate:api": "pnpm --filter @vitask/backend-api generate"
