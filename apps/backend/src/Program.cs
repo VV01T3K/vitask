@@ -7,10 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string FrontendCorsPolicy = "Frontend";
 
+var scalarEnabled = builder.Configuration.GetValue(
+    "Scalar:Enabled",
+    builder.Environment.IsDevelopment()
+);
+
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
-builder.Services.AddFluentValidationRulesToOpenApi();
 builder.Services.AddInMemorySqliteDatabase();
 builder.Services.AddOpenApi(options => options.AddFluentValidationRules());
+builder.Services.AddFluentValidationRulesToOpenApi();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -38,14 +43,20 @@ var app = builder.Build();
 
 app.EnsureDatabaseCreated();
 
-app.MapOpenApi();
-app.MapScalarApiReference(options =>
+if (scalarEnabled)
 {
-    options.Title = "Vitask API";
-    options.WithDefaultHttpClient(ScalarTarget.Node, ScalarClient.Fetch);
-});
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "Vitask API";
+        options.WithDefaultHttpClient(ScalarTarget.Node, ScalarClient.Fetch);
+    });
+}
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors(FrontendCorsPolicy);
 
 app.MapTaskEndpoints();

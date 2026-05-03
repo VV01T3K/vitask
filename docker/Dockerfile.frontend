@@ -1,0 +1,31 @@
+FROM node:24-bookworm-slim AS deps
+RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
+WORKDIR /repo
+COPY pnpm-lock.yaml ./
+RUN pnpm fetch
+
+FROM deps AS build
+COPY . .
+RUN pnpm install --frozen-lockfile --offline
+
+ARG VITE_BACKEND_URL=http://localhost:5107
+ARG VITE_SCALAR_ENABLED=false
+ARG VITE_SCALAR_URL=http://localhost:5107/scalar
+
+RUN pnpm --filter frontend build
+
+FROM deps AS prod-deps
+COPY . .
+ENV CI=true
+RUN pnpm install --prod --frozen-lockfile --offline
+
+FROM node:24-bookworm-slim AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+USER node
+COPY --from=prod-deps --chown=node:node /repo/node_modules ./node_modules
+COPY --from=prod-deps --chown=node:node /repo/shared/backend-api ./shared/backend-api
+COPY --from=build --chown=node:node /repo/apps/frontend ./apps/frontend
+WORKDIR /app/apps/frontend
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]

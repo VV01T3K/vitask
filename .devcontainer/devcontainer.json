@@ -1,49 +1,48 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-	"name": "C# (.NET)",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": ".."
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {
-			"moby": false,
-			"azureDnsAutoDetection": false
-		}
-	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [5000, 5001],
-	// "portsAttributes": {
-	//		"5001": {
-	//			"protocol": "https"
-	//		}
-	// }
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"onCreateCommand": "rm -f .mise-setup-done && mise trust && mise install",
-	// "postCreateCommand": "dotnet restore",
-	// Configure tool-specific properties.
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"hverlin.mise-vscode",
-				"Anthropic.claude-code",
-				"bradlc.vscode-tailwindcss",
-				"tamasfe.even-better-toml",
-				"openai.chatgpt",
-				"sst-dev.opencode",
-				"docker.docker",
-				"csharpier.csharpier-vscode",
-				"ms-dotnettools.csharp",
-				"VoidZero.vite-plus-extension-pack"
-			]
-		}
-	}
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
-	,
-	"remoteEnv": {
-		"PATH": "/home/vscode/.local/share/mise/shims:/home/vscode/.local/bin:${containerEnv:PATH}"
-	}
+  "name": "C# (.NET)",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false,
+      "azureDnsAutoDetection": false
+    }
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [3000, 5107],
+  // "portsAttributes": {
+  //		"5001": {
+  //			"protocol": "https"
+  //		}
+  // }
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "onCreateCommand": "rm -f .mise-setup-done && mise trust && mise install",
+  // "postCreateCommand": "dotnet restore",
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hverlin.mise-vscode",
+        "Anthropic.claude-code",
+        "bradlc.vscode-tailwindcss",
+        "tamasfe.even-better-toml",
+        "openai.chatgpt",
+        "sst-dev.opencode",
+        "docker.docker",
+        "csharpier.csharpier-vscode",
+        "ms-dotnettools.csharp",
+        "VoidZero.vite-plus-extension-pack"
+      ]
+    }
+  },
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+  "remoteEnv": {
+    "PATH": "/home/vscode/.local/share/mise/shims:/home/vscode/.local/bin:${containerEnv:PATH}"
+  }
 }

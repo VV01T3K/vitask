@@ -17,19 +17,27 @@ function Logo() {
   );
 }
 
+const SCALAR_ENABLED =
+  import.meta.env.VITE_SCALAR_ENABLED === undefined
+    ? import.meta.env.DEV
+    : import.meta.env.VITE_SCALAR_ENABLED === "true";
+const SCALAR_URL = import.meta.env.VITE_SCALAR_URL ?? "http://localhost:5107/scalar";
+
 export default function Header() {
   return (
     <header className="border-vitask-border bg-vitask-bg flex items-center justify-between border-b px-6 py-3.5">
       <Logo />
       <div className="flex items-center gap-4">
-        <a
-          href="http://localhost:5107/scalar"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-vitask-text-secondary hover:text-vitask-accent text-sm transition-colors"
-        >
-          API
-        </a>
+        {SCALAR_ENABLED && (
+          <a
+            href={SCALAR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-vitask-text-secondary hover:text-vitask-accent text-sm transition-colors"
+          >
+            API
+          </a>
+        )}
         <ThemeToggle />
       </div>
     </header>

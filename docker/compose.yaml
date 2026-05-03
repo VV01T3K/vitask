@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "${BACKEND_HOST_PORT:-5107}:5107"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:5107"
+      Cors__AllowedOrigins__0: "${PUBLIC_FRONTEND_URL:-http://localhost:3000}"
+      Scalar__Enabled: "${SCALAR_ENABLED:-false}"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        VITE_BACKEND_URL: "${PUBLIC_BACKEND_URL:-http://localhost:5107}"
+        VITE_SCALAR_ENABLED: "${SCALAR_ENABLED:-false}"
+        VITE_SCALAR_URL: "${PUBLIC_BACKEND_URL:-http://localhost:5107}/scalar"
+    ports:
+      - "${FRONTEND_HOST_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: "http://backend:5107"
+      GROQ_API_KEY: "${GROQ_API_KEY:?GROQ_API_KEY required — copy .env.example to .env}"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped

@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
+WORKDIR /src
+COPY apps/backend/ ./
+RUN dotnet publish -c Release -o /publish \
+    -p:UseAppHost=false \
+    -p:OpenApiGenerateDocuments=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
+WORKDIR /app
+COPY --from=build /publish ./
+EXPOSE 5107
+ENV ASPNETCORE_URLS=http://+:5107
+ENTRYPOINT ["dotnet", "backend.dll"]

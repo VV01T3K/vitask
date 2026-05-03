@@ -8,7 +8,8 @@
   "scripts": {
     "gen": "orval -c orval.config.ts",
     "build": "vpr gen",
-    "dev": "orval -c orval.config.ts --watch"
+    "dev": "orval -c orval.config.ts --watch",
+    "check": "tsc --noEmit"
   },
   "devDependencies": {
     "@tanstack/react-query": "^5.100.6",

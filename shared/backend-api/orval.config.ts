@@ -13,7 +13,10 @@ export default defineConfig({
       },
       client: "react-query",
       mode: "tags",
-      baseUrl: "http://localhost:5107",
+      baseUrl: {
+        runtime: "API_BASE_URL",
+        imports: [{ name: "API_BASE_URL", importPath: "../../api-base" }],
+      },
       clean: true,
       indexFiles: true,
       fileExtension: ".gen.ts",

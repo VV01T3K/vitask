@@ -17,6 +17,8 @@ import type {
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
 
+import { API_BASE_URL } from "../../api-base";
+
 import { TaskResponse } from "../model";
 import type {
   CreateTaskRequest,
@@ -45,7 +47,7 @@ export type createTaskResponseError = createTaskResponse400 & {
 };
 
 export const getCreateTaskUrl = () => {
-  return `http://localhost:5107/tasks`;
+  return `${API_BASE_URL}/tasks`;
 };
 
 export const createTask = async (
@@ -149,7 +151,7 @@ export type listTasksResponseSuccess = listTasksResponse200 & {
 };
 
 export const getListTasksUrl = () => {
-  return `http://localhost:5107/tasks`;
+  return `${API_BASE_URL}/tasks`;
 };
 
 export const listTasks = async (options?: RequestInit): Promise<listTasksResponseSuccess> => {
@@ -171,7 +173,7 @@ export const listTasks = async (options?: RequestInit): Promise<listTasksRespons
 };
 
 export const getListTasksQueryKey = () => {
-  return [`http://localhost:5107/tasks`] as const;
+  return [`${API_BASE_URL}/tasks`] as const;
 };
 
 export const getListTasksSuspenseQueryOptions = <
@@ -273,7 +275,7 @@ export type getTaskResponseError = getTaskResponse404 & {
 };
 
 export const getGetTaskUrl = (id: string) => {
-  return `http://localhost:5107/tasks/${id}`;
+  return `${API_BASE_URL}/tasks/${id}`;
 };
 
 export const getTask = async (
@@ -301,7 +303,7 @@ export const getTask = async (
 };
 
 export const getGetTaskQueryKey = (id: string) => {
-  return [`http://localhost:5107/tasks/${id}`] as const;
+  return [`${API_BASE_URL}/tasks/${id}`] as const;
 };
 
 export const getGetTaskSuspenseQueryOptions = <
@@ -398,7 +400,7 @@ export type deleteTaskResponseError = deleteTaskResponse404 & {
 };
 
 export const getDeleteTaskUrl = (id: string) => {
-  return `http://localhost:5107/tasks/${id}`;
+  return `${API_BASE_URL}/tasks/${id}`;
 };
 
 export const deleteTask = async (
@@ -497,7 +499,7 @@ export type setTaskCompletionResponseError = setTaskCompletionResponse404 & {
 };
 
 export const getSetTaskCompletionUrl = (id: string) => {
-  return `http://localhost:5107/tasks/${id}/completion`;
+  return `${API_BASE_URL}/tasks/${id}/completion`;
 };
 
 export const setTaskCompletion = async (
@@ -603,7 +605,7 @@ export type wrapUpTasksResponseSuccess = wrapUpTasksResponse200 & {
 };
 
 export const getWrapUpTasksUrl = () => {
-  return `http://localhost:5107/tasks/wrap-up`;
+  return `${API_BASE_URL}/tasks/wrap-up`;
 };
 
 export const wrapUpTasks = async (options?: RequestInit): Promise<wrapUpTasksResponseSuccess> => {

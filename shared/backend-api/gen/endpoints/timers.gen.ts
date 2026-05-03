@@ -17,6 +17,8 @@ import type {
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
 
+import { API_BASE_URL } from "../../api-base";
+
 import { TimerResponse } from "../model";
 import type {
   CreateTimerRequest,
@@ -45,7 +47,7 @@ export type createTimerResponseError = createTimerResponse400 & {
 };
 
 export const getCreateTimerUrl = () => {
-  return `http://localhost:5107/timers`;
+  return `${API_BASE_URL}/timers`;
 };
 
 export const createTimer = async (
@@ -149,7 +151,7 @@ export type listTimersResponseSuccess = listTimersResponse200 & {
 };
 
 export const getListTimersUrl = () => {
-  return `http://localhost:5107/timers`;
+  return `${API_BASE_URL}/timers`;
 };
 
 export const listTimers = async (options?: RequestInit): Promise<listTimersResponseSuccess> => {
@@ -171,7 +173,7 @@ export const listTimers = async (options?: RequestInit): Promise<listTimersRespo
 };
 
 export const getListTimersQueryKey = () => {
-  return [`http://localhost:5107/timers`] as const;
+  return [`${API_BASE_URL}/timers`] as const;
 };
 
 export const getListTimersSuspenseQueryOptions = <
@@ -278,7 +280,7 @@ export type updateTimerResponseError = (updateTimerResponse400 | updateTimerResp
 };
 
 export const getUpdateTimerUrl = (id: string) => {
-  return `http://localhost:5107/timers/${id}`;
+  return `${API_BASE_URL}/timers/${id}`;
 };
 
 export const updateTimer = async (
@@ -396,7 +398,7 @@ export type deleteTimerResponseError = (deleteTimerResponse404 | deleteTimerResp
 };
 
 export const getDeleteTimerUrl = (id: string) => {
-  return `http://localhost:5107/timers/${id}`;
+  return `${API_BASE_URL}/timers/${id}`;
 };
 
 export const deleteTimer = async (

@@ -30,3 +30,7 @@ obj/
 
 # AI agent worktrees
 .claude/worktrees/
+
+
+.env*
+!.env.example
