@@ -176,9 +176,7 @@ export function CreateTimerModal({
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div
-        className="vitask-modal-in bg-vitask-surface border-vitask-border-bright w-full max-w-[560px] rounded-lg border shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
-      >
+      <div className="vitask-modal-in bg-vitask-surface border-vitask-border-bright w-full max-w-[560px] rounded-lg border shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
         <div className="border-vitask-border flex items-center justify-between border-b px-5 py-4">
           <span className="font-vitask-mono text-vitask-text-primary text-sm font-medium tracking-[-0.01em]">
             {isEditing ? "Edit Timer" : "Create Timer"}

@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 function Logo() {
   return (
-    <Link to="/dashboard">
+    <Link to="/">
       <div className="font-vitask-mono text-vitask-text-primary text-[18px] font-semibold tracking-[-0.02em] select-none">
         <span className="text-vitask-text-tertiary text-xl font-normal">[</span>
         <span className="text-vitask-accent bg-vitask-accent/15 rounded-sm px-px font-bold">
