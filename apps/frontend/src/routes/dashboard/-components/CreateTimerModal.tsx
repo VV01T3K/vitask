@@ -19,8 +19,11 @@ import { TimerAppearancePicker } from "./TimerAppearancePicker";
 
 type TimerResponse = model.TimerResponse;
 
-const timerDurationMinMinutes = model.createTimerRequestDurationSecondsMinOne / 60;
-const timerDurationMaxMinutes = model.createTimerRequestDurationSecondsMaxOne / 60;
+function formatDurationLimit(totalSeconds: number): string {
+  if (totalSeconds < 60) return `${totalSeconds} second${totalSeconds === 1 ? "" : "s"}`;
+  const minutes = totalSeconds / 60;
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+}
 
 const timerFormSchema = z.object({
   title: z
@@ -113,6 +116,7 @@ export function CreateTimerModal({
   const generateInstructions = useServerFn(generateTimerInstructionsFn);
   const [generating, setGenerating] = useState(false);
   const [streamingTarget, setStreamingTarget] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const { text: typedText, done: typingDone } = useTypewriter(streamingTarget ?? "");
   const form = useAppForm({
     defaultValues: isEditing ? timerToFormValues(timer) : emptyTimerFormValues,
@@ -137,6 +141,7 @@ export function CreateTimerModal({
     if (!open) {
       setGenerating(false);
       setStreamingTarget(null);
+      setSubmitted(false);
       form.reset(isEditing ? timerToFormValues(timer) : emptyTimerFormValues);
     }
   }, [form, isEditing, open, timer]);
@@ -196,6 +201,7 @@ export function CreateTimerModal({
           onSubmit={(event) => {
             event.preventDefault();
             event.stopPropagation();
+            setSubmitted(true);
             void form.handleSubmit().catch((error: unknown) => {
               console.error("Unable to submit timer", error);
             });
@@ -208,7 +214,8 @@ export function CreateTimerModal({
                   <Field
                     errors={field.state.meta.errors}
                     label="Title"
-                    touched={field.state.meta.isTouched}
+                    submitted={submitted}
+                    touched={field.state.meta.isDirty}
                   >
                     <input
                       autoFocus
@@ -284,6 +291,37 @@ export function CreateTimerModal({
                     )}
                   </form.AppField>
                 </div>
+                <form.Subscribe
+                  selector={(state) => ({
+                    hours: state.values.hours,
+                    minutes: state.values.minutes,
+                    seconds: state.values.seconds,
+                    anyDirty:
+                      (state.fieldMeta.hours?.isDirty ||
+                        state.fieldMeta.minutes?.isDirty ||
+                        state.fieldMeta.seconds?.isDirty) ??
+                      false,
+                  })}
+                >
+                  {({ hours, minutes, seconds, anyDirty }) => {
+                    if (!submitted && !anyDirty) return null;
+                    const total =
+                      (Number(hours) || 0) * 3600 +
+                      (Number(minutes) || 0) * 60 +
+                      (Number(seconds) || 0);
+                    if (total < model.createTimerRequestDurationSecondsMinOne) {
+                      return (
+                        <p className="text-[11px] text-red-300">{`Duration must be at least ${formatDurationLimit(model.createTimerRequestDurationSecondsMinOne)}.`}</p>
+                      );
+                    }
+                    if (total > model.createTimerRequestDurationSecondsMaxOne) {
+                      return (
+                        <p className="text-[11px] text-red-300">{`Duration must be at most ${formatDurationLimit(model.createTimerRequestDurationSecondsMaxOne)}.`}</p>
+                      );
+                    }
+                    return null;
+                  }}
+                </form.Subscribe>
               </div>
 
               <form.AppField name="description">
@@ -291,7 +329,8 @@ export function CreateTimerModal({
                   <Field
                     errors={field.state.meta.errors}
                     label="Description (optional)"
-                    touched={field.state.meta.isTouched}
+                    submitted={submitted}
+                    touched={field.state.meta.isDirty}
                   >
                     <input
                       className="bg-vitask-elevated border-vitask-border text-vitask-text-primary focus:border-vitask-accent rounded border px-3 py-2.5 text-sm transition-colors outline-none"
@@ -311,7 +350,8 @@ export function CreateTimerModal({
                   <Field
                     errors={field.state.meta.errors}
                     label="AI Instructions"
-                    touched={field.state.meta.isTouched}
+                    submitted={submitted}
+                    touched={field.state.meta.isDirty}
                   >
                     <textarea
                       className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent min-h-24 resize-none rounded border px-3 py-2.5 text-[13px] leading-[1.55] transition-colors outline-none"
@@ -327,16 +367,11 @@ export function CreateTimerModal({
                 )}
               </form.AppField>
 
-              <form.Subscribe
-                selector={(state) => ({
-                  title: state.values.title,
-                  canSubmit: state.canSubmit,
-                })}
-              >
-                {({ title, canSubmit }) => (
+              <form.Subscribe selector={(state) => ({ title: state.values.title })}>
+                {({ title }) => (
                   <>
                     <button
-                      className="border-vitask-teal/45 text-vitask-teal hover:bg-vitask-teal/10 hover:border-vitask-teal inline-flex items-center gap-2 self-start rounded border bg-transparent px-3 py-2 text-xs font-medium transition disabled:cursor-wait disabled:opacity-60"
+                      className="border-vitask-teal/45 text-vitask-teal hover:bg-vitask-teal/10 hover:border-vitask-teal inline-flex items-center gap-2 self-start rounded border bg-transparent px-3 py-2 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={generating || isStreaming || isSubmitting || !title.trim()}
                       onClick={() => {
                         void handleGenerate();
@@ -372,7 +407,7 @@ export function CreateTimerModal({
                       </button>
                       <button
                         className="bg-vitask-accent/15 border-vitask-accent/40 hover:bg-vitask-accent/25 hover:border-vitask-accent text-vitask-accent inline-flex items-center gap-2 rounded border px-4 py-2 text-[13px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={!canSubmit || generating || isStreaming || isSubmitting}
+                        disabled={generating || isStreaming || isSubmitting}
                         type="submit"
                       >
                         {isSubmitting ? (
@@ -426,13 +461,15 @@ function toTimerSubmitValues(values: TimerFormValues): TimerSubmitValues | null 
 
   if (totalSeconds < model.createTimerRequestDurationSecondsMinOne) {
     console.warn(
-      `Duration must be at least ${timerDurationMinMinutes} minute${timerDurationMinMinutes === 1 ? "" : "s"}.`,
+      `Duration must be at least ${formatDurationLimit(model.createTimerRequestDurationSecondsMinOne)}.`,
     );
     return null;
   }
 
   if (totalSeconds > model.createTimerRequestDurationSecondsMaxOne) {
-    console.warn(`Duration must be ${timerDurationMaxMinutes} minutes or less.`);
+    console.warn(
+      `Duration must be at most ${formatDurationLimit(model.createTimerRequestDurationSecondsMaxOne)}.`,
+    );
     return null;
   }
 
@@ -451,15 +488,17 @@ function toTimerSubmitValues(values: TimerFormValues): TimerSubmitValues | null 
 function Field({
   label,
   touched,
+  submitted,
   errors,
   children,
 }: {
   label: string;
   touched: boolean;
+  submitted?: boolean;
   errors: unknown[];
   children: React.ReactNode;
 }) {
-  const messages = touched ? getFieldErrorMessages(errors) : [];
+  const messages = touched || submitted ? getFieldErrorMessages(errors) : [];
 
   return (
     <div className="flex flex-col gap-1.5">

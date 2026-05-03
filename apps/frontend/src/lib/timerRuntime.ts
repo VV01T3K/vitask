@@ -36,7 +36,7 @@ export function getRemainingSeconds(
   if (!runtime) return timerDurationSeconds;
   if (runtime.firing) return 0;
 
-  return Math.max(0, Math.ceil((runtime.nextFireAt - now) / 1000));
+  return Math.max(0, Math.floor((runtime.nextFireAt - now) / 1000));
 }
 
 export function syncRuntimesWithTimers(

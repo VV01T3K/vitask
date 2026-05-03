@@ -104,7 +104,7 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
 
     const expiredTimers = timers.filter((timer) => {
       const runtime = runtimes[timer.id] ?? createRuntime(durationSeconds(timer));
-      return !runtime.firing && runtime.nextFireAt <= now;
+      return !runtime.firing && runtime.nextFireAt - now < 100;
     });
 
     if (expiredTimers.length === 0) return;
@@ -115,7 +115,7 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
 
       for (const timer of expiredTimers) {
         const current = next[timer.id] ?? createRuntime(durationSeconds(timer));
-        if (current.firing || current.nextFireAt > now) continue;
+        if (current.firing || current.nextFireAt - now >= 100) continue;
 
         next[timer.id] = { ...current, firing: true, message: "..." };
         changed = true;
