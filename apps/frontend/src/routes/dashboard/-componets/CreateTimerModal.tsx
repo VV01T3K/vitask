@@ -313,7 +313,7 @@ export function CreateTimerModal({
                     touched={field.state.meta.isTouched}
                   >
                     <textarea
-                      className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent min-h-24 resize-y rounded border px-3 py-2.5 text-[13px] leading-[1.55] transition-colors outline-none"
+                      className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent min-h-24 resize-none rounded border px-3 py-2.5 text-[13px] leading-[1.55] transition-colors outline-none"
                       disabled={isSubmitting || isStreaming}
                       name={field.name}
                       onBlur={field.handleBlur}
