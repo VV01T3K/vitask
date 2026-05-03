@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { getRuntimeConfig } from "#/lib/runtimeConfig";
+
 import ThemeToggle from "./ThemeToggle";
 
 function Logo() {
@@ -17,20 +19,16 @@ function Logo() {
   );
 }
 
-const SCALAR_ENABLED =
-  import.meta.env.VITE_SCALAR_ENABLED === undefined
-    ? import.meta.env.DEV
-    : import.meta.env.VITE_SCALAR_ENABLED === "true";
-const SCALAR_URL = import.meta.env.VITE_SCALAR_URL ?? "http://localhost:5107/scalar";
-
 export default function Header() {
+  const { scalarEnabled, scalarUrl } = getRuntimeConfig();
+
   return (
     <header className="border-vitask-border bg-vitask-bg flex items-center justify-between border-b px-6 py-3.5">
       <Logo />
       <div className="flex items-center gap-4">
-        {SCALAR_ENABLED && (
+        {scalarEnabled && (
           <a
-            href={SCALAR_URL}
+            href={scalarUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-vitask-text-secondary hover:text-vitask-accent text-sm transition-colors"

@@ -16,16 +16,14 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.frontend
-      args:
-        VITE_BACKEND_URL: "${PUBLIC_BACKEND_URL:-http://localhost:5107}"
-        VITE_SCALAR_ENABLED: "${SCALAR_ENABLED:-false}"
-        VITE_SCALAR_URL: "${PUBLIC_BACKEND_URL:-http://localhost:5107}/scalar"
     ports:
       - "${FRONTEND_HOST_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       BACKEND_URL: "http://backend:5107"
-      GROQ_API_KEY: "${GROQ_API_KEY:?GROQ_API_KEY required — copy .env.example to .env}"
+      PUBLIC_BACKEND_URL: "${PUBLIC_BACKEND_URL:-http://localhost:5107}"
+      SCALAR_ENABLED: "${SCALAR_ENABLED:-false}"
+      GROQ_API_KEY: "${GROQ_API_KEY:?GROQ_API_KEY required run -> vpr --no-cache env}"
     depends_on:
       backend:
         condition: service_started

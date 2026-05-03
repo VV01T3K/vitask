@@ -11,6 +11,7 @@ import { Toaster } from "sonner";
 import Header from "#/components/Header";
 import { useSuppressLocalDurableStreamWarning } from "#/integrations/durable-streams/useSuppressLocalDurableStreamWarning";
 import TanStackQueryDevtools from "#/integrations/tanstack/query/devtools";
+import { getRuntimeConfig } from "#/lib/runtimeConfig";
 
 import appCss from "#/styles.css?url";
 
@@ -74,6 +75,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__APP_CONFIG__=${JSON.stringify(getRuntimeConfig())}`,
+          }}
+        />
       </head>
       <body>
         <ThemeProvider

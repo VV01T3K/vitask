@@ -7,11 +7,6 @@ RUN pnpm fetch
 FROM deps AS build
 COPY . .
 RUN pnpm install --frozen-lockfile --offline
-
-ARG VITE_BACKEND_URL=http://localhost:5107
-ARG VITE_SCALAR_ENABLED=false
-ARG VITE_SCALAR_URL=http://localhost:5107/scalar
-
 RUN pnpm --filter frontend build
 
 FROM deps AS prod-deps
