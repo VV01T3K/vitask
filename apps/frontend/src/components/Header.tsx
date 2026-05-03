@@ -24,6 +24,8 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <a
           href="http://localhost:5107/scalar"
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-vitask-text-secondary hover:text-vitask-accent text-sm transition-colors"
         >
           API

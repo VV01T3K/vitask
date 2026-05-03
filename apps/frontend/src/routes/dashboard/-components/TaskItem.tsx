@@ -2,6 +2,7 @@ import type { model } from "@vitask/backend-api";
 import { RotateCcw, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 
+import { useParticleBurst } from "#/hooks/useParticleBurst";
 import { relTime } from "#/lib/timerUtils";
 
 type TaskResponse = model.TaskResponse;
@@ -15,12 +16,6 @@ type TaskItemProps = {
   onDelete: (id: string) => void;
 };
 
-type Particle = {
-  id: number;
-  dx: number;
-  dy: number;
-};
-
 export function TaskItem({
   task,
   hype,
@@ -31,24 +26,13 @@ export function TaskItem({
 }: TaskItemProps) {
   const [completing, setCompleting] = useState(false);
   const [striking, setStriking] = useState(false);
-  const [particles, setParticles] = useState<Particle[]>([]);
   const [showHype, setShowHype] = useState(false);
-
-  function fireParticles() {
-    const baseId = Date.now();
-    const next: Particle[] = Array.from({ length: 6 }, (_, i) => {
-      const angle = (i / 6) * Math.PI * 2 + Math.random() * 0.5;
-      const dist = 16 + Math.random() * 10;
-      return { id: baseId + i, dx: Math.cos(angle) * dist, dy: Math.sin(angle) * dist };
-    });
-    setParticles(next);
-    setTimeout(() => setParticles([]), 700);
-  }
+  const { particles, burst } = useParticleBurst();
 
   function handleComplete() {
     if (completing || task.isCompleted) return;
     setCompleting(true);
-    fireParticles();
+    burst();
     setTimeout(() => setStriking(true), 100);
     setTimeout(() => onComplete(task.id), 400);
   }

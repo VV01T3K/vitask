@@ -7,6 +7,7 @@ import { z } from "zod";
 import { generateTimerInstructionsFn } from "#/functions/timer.functions";
 import { useTypewriter } from "#/hooks/useTypewriter";
 import { useAppForm } from "#/integrations/tanstack/form";
+import { getFieldErrorMessages } from "#/lib/formErrors";
 import {
   defaultTimerAppearance,
   normalizeTimerAppearance,
@@ -479,21 +480,4 @@ function Field({
       ) : null}
     </div>
   );
-}
-
-function getFieldErrorMessages(errors: unknown[]): string[] {
-  return [...new Set(flattenFieldErrors(errors))];
-}
-
-function flattenFieldErrors(errors: unknown[]): string[] {
-  return errors.flatMap((error) => {
-    if (!error) return [];
-    if (Array.isArray(error)) return flattenFieldErrors(error);
-    if (typeof error === "string") return [error];
-    if (typeof error === "object" && "message" in error) {
-      const message = (error as { message?: unknown }).message;
-      if (typeof message === "string") return [message];
-    }
-    return ["Invalid value"];
-  });
 }

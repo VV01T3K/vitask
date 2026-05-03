@@ -1,7 +1,7 @@
 import type { model } from "@vitask/backend-api";
 import { Lock, Pencil, Sparkle, Trash2 } from "lucide-react";
-import { useState } from "react";
 
+import { useParticleBurst } from "#/hooks/useParticleBurst";
 import { useTypewriter } from "#/hooks/useTypewriter";
 import {
   getTimerIconOption,
@@ -25,12 +25,6 @@ type TimerCardProps = {
   onDelete: (id: string) => void;
 };
 
-type Particle = {
-  id: number;
-  dx: number;
-  dy: number;
-};
-
 export function TimerCard({
   timer,
   runtime,
@@ -47,7 +41,13 @@ export function TimerCard({
   const timerDurationSeconds = durationSeconds(timer);
   const pct = Math.round(((timerDurationSeconds - remaining) / timerDurationSeconds) * 100);
   const warning = !isFiring && remaining <= 60 && remaining > 0;
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const { particles, burst } = useParticleBurst({
+    count: 10,
+    baseDistance: 22,
+    jitterDistance: 14,
+    angleJitter: 0.4,
+    durationMs: 900,
+  });
   const resolvedAppearance = normalizeTimerAppearance(appearance);
   const iconOption = getTimerIconOption(resolvedAppearance.icon);
   const Icon = iconOption.Icon;
@@ -56,14 +56,7 @@ export function TimerCard({
   const { text: typedText, done: typingDone } = useTypewriter(streamed, 8, isFiring);
 
   function handleDone() {
-    const baseId = Date.now();
-    const next: Particle[] = Array.from({ length: 10 }, (_, i) => {
-      const angle = (i / 10) * Math.PI * 2 + Math.random() * 0.4;
-      const dist = 22 + Math.random() * 14;
-      return { id: baseId + i, dx: Math.cos(angle) * dist, dy: Math.sin(angle) * dist };
-    });
-    setParticles(next);
-    setTimeout(() => setParticles([]), 900);
+    burst();
     onFireDone(timer.id);
   }
 
