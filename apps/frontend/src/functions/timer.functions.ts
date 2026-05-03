@@ -22,15 +22,9 @@ export const generateTimerNudgeFn = createServerFn({ method: "POST" })
     if (snapshot.timerNudges[data.timerId]) return snapshot.timerNudges[data.timerId];
     const result = await generateText({
       systemPrompt:
-        "You write short wellness timer nudges for a productivity app. Be concise, encouraging, and actionable.",
-      userPrompt: [
-        `Timer title: ${data.timerTitle}`,
-        `Timer description: ${data.timerDescription}`,
-        `Custom instructions: ${data.aiInstructions}`,
-        `Completed tasks this session: ${data.completedTaskCount}`,
-        "Write a 1 or 2 sentence nudge.",
-      ].join("\n"),
-      fallback: `${data.timerDescription} Take a quick reset, then get back to it.`,
+        "You are a well being and healthy habits expert integrated into a work app. Craft a 1 to 2 sentence wellness nudge to help the user reset during a break. Focus on actionable micro habits (e.g., eye rest, stretching, posture, deep breaths) without sounding purely clinical. Tone: Empathetic, grounding, warmly encouraging, and highly specific. CRITICAL: Do not use em dashes or spaced hyphens in your output.",
+      userPrompt: `Context: The timer "${data.timerTitle}" just finished. Description: ${data.timerDescription}. Custom instructions: ${data.aiInstructions}. The user has completed ${data.completedTaskCount} tasks this session. Write a 1 to 2 sentence well being nudge that encourages healthy recovery before they return to work.`,
+      fallback: `${data.timerDescription || data.timerTitle} Stand up, stretch your shoulders, and take a deep breath before diving back in.`,
       maxTokens: 500,
     });
     await appendSessionEvent({
@@ -53,14 +47,9 @@ export const generateTimerInstructionsFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) =>
     generateText({
       systemPrompt:
-        "You write timer instructions for a productivity app. Output plain text only. Keep it practical, direct, and under 3 short sentences.",
-      userPrompt: [
-        `Timer title: ${data.title}`,
-        `Timer description: ${data.description || "(none)"}`,
-        `Current active tasks: ${data.activeTaskTitles.join(", ") || "(none)"}`,
-        "Write the instruction text that should be used when this timer fires.",
-      ].join("\n"),
-      fallback: `When this fires, remind me to ${data.title.toLowerCase()} and take a short reset before jumping back in.`,
+        "You are a precise, highly articulate AI system guiding a user through their workflow. Convert timer contexts into direct, actionable instructions. Be exceptionally clear, practical, and limit yourself to a maximum of 3 short sentences. Output plain text only without markdown, formatting, or conversational filler. CRITICAL: Do not use em dashes or spaced hyphens in your output.",
+      userPrompt: `Timer alert: "${data.title}". Description: ${data.description}. Currently active tasks, if any: [${data.activeTaskTitles.join(", ")}]. Write the exact, plain spoken instruction the user should read or hear right now to transition smoothly.`,
+      fallback: `Timer "${data.title}" is complete. Take a brief reset before resuming your active tasks.`,
       maxTokens: 500,
     }),
   );

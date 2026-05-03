@@ -18,15 +18,15 @@ const emptyStats: WrapUpStats = { tasks: 0, fired: 0, snoozed: 0, minutes: 0 };
 
 type SessionWrapUpProps = {
   sessionStartedAt: number;
-  firedCount: number;
-  snoozedCount: number;
+  firedTimers: { id: string; title: string }[];
+  snoozedTimers: { id: string; title: string }[];
   onComplete: () => void;
 };
 
 export function SessionWrapUp({
   sessionStartedAt,
-  firedCount,
-  snoozedCount,
+  firedTimers,
+  snoozedTimers,
   onComplete,
 }: SessionWrapUpProps) {
   const { data: tasksResponse } = api.useListTasksSuspense();
@@ -44,8 +44,8 @@ export function SessionWrapUp({
 
     setStats({
       tasks: completedTaskCount,
-      fired: firedCount,
-      snoozed: snoozedCount,
+      fired: firedTimers.length,
+      snoozed: snoozedTimers.length,
       minutes,
     });
     setOpen(true);
@@ -54,26 +54,31 @@ export function SessionWrapUp({
     const sessionTasks = await wrapUpTasks.mutateAsync();
     const debrief = await generateWrapUp({
       data: {
-        firedCount,
-        snoozedCount,
+        firedCount: firedTimers.length,
+        snoozedCount: snoozedTimers.length,
         minutes,
         tasks: sessionTasks.data.map((task) => ({
           title: task.title,
           isCompleted: task.isCompleted,
         })),
-        timers: timersResponse.data.map((timer) => ({
-          title: timer.title,
-          description: timer.description,
-        })),
+        timers: timersResponse.data.map((timer) => {
+          const isFired = firedTimers.some((t) => t.id === timer.id);
+          const isSnoozed = snoozedTimers.some((t) => t.id === timer.id);
+          return {
+            title: timer.title,
+            description: timer.description,
+            status: isFired ? "fired" : isSnoozed ? "snoozed" : "unused",
+          };
+        }),
       },
     });
 
     setText(debrief);
   }, [
-    firedCount,
+    firedTimers,
     generateWrapUp,
     sessionStartedAt,
-    snoozedCount,
+    snoozedTimers,
     tasksResponse.data,
     timersResponse.data,
     wrapUpTasks,

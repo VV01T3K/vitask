@@ -60,6 +60,8 @@ export function TimerCard({
     onFireDone(timer.id);
   }
 
+  const snoozeSeconds = remaining >= 5 * 60 ? remaining + 5 * 60 : timerDurationSeconds;
+
   return (
     <article
       className={
@@ -162,10 +164,10 @@ export function TimerCard({
             </button>
             <button
               className="bg-vitask-elevated border-vitask-border text-vitask-text-primary hover:border-vitask-border-bright flex-1 rounded border px-3 py-1.5 text-xs font-medium transition"
-              onClick={() => onSnooze(timer.id, 5 * 60)}
+              onClick={() => onSnooze(timer.id, snoozeSeconds)}
               type="button"
             >
-              +5 min
+              Snooze
             </button>
             {particles.length > 0 ? (
               <div className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-0 w-0">

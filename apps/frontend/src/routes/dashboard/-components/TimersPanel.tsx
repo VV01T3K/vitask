@@ -27,8 +27,8 @@ type TimerResponse = model.TimerResponse;
 
 type TimersPanelProps = {
   initialNudges: Record<string, string>;
-  onTimerFired: (count: number) => void;
-  onTimerSnoozed: () => void;
+  onTimerFired: (timers: { id: string; title: string }[]) => void;
+  onTimerSnoozed: (timer: { id: string; title: string }) => void;
 };
 
 function isTimerPageActive() {
@@ -124,7 +124,7 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
       return changed ? next : previous;
     });
 
-    onTimerFired(expiredTimers.length);
+    onTimerFired(expiredTimers.map((t) => ({ id: t.id, title: t.title })));
 
     for (const timer of expiredTimers) {
       void generateTimerNudge({
@@ -274,6 +274,7 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
 
   const snoozeTimer = useCallback(
     (id: string, seconds: number) => {
+      const timer = timers.find((t) => t.id === id);
       stopAlert(id);
       setRuntimes((previous) => ({
         ...previous,
@@ -283,9 +284,11 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
           message: null,
         },
       }));
-      onTimerSnoozed();
+      if (timer) {
+        onTimerSnoozed({ id: timer.id, title: timer.title });
+      }
     },
-    [onTimerSnoozed, stopAlert],
+    [onTimerSnoozed, stopAlert, timers],
   );
 
   const createError = createTimerMutation.error

@@ -11,7 +11,13 @@ export const generateWrapUpFn = createServerFn({ method: "POST" })
       snoozedCount: z.number().int().nonnegative(),
       minutes: z.number().int().nonnegative(),
       tasks: z.array(z.object({ title: z.string(), isCompleted: z.boolean() })),
-      timers: z.array(z.object({ title: z.string(), description: z.string() })),
+      timers: z.array(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+          status: z.enum(["fired", "snoozed", "unused"]),
+        }),
+      ),
     }),
   )
   .handler(async ({ data }) => {
@@ -29,21 +35,25 @@ export const generateWrapUpFn = createServerFn({ method: "POST" })
       .join("\n");
 
     const timerLines = data.timers
-      .map((t) => `- ${t.title}: ${t.description || "(no description)"}`)
+      .map((t) => {
+        const statusLabel = t.status === "fired" ? "🔥" : t.status === "snoozed" ? "💤" : "○";
+        return `${statusLabel} ${t.title}: ${t.description || "(no description)"}`;
+      })
       .join("\n");
 
-    const userPrompt = [
-      `Tasks:\n${taskLines || "(none)"}`,
-      `Timers:\n${timerLines || "(none)"}`,
-      `Stats: ${data.firedCount} timers fired, ${data.snoozedCount} snoozed, ${data.minutes} min`,
-      `Session events:\n${eventLines || "(no AI events recorded)"}`,
-    ].join("\n\n");
+    const userPrompt = `Session data:
+Tasks completed: ${taskLines || "none"}
+Timers used: ${timerLines || "none"}
+Stats: ${data.firedCount} timers fired, ${data.snoozedCount} snoozed, ${data.minutes} total minutes of focus.
+Recent session notes: ${eventLines || "none"}
+
+Write a personalized, intelligent narrative debrief that makes the user feel accomplished and centered. Do not just list the stats; weave them into a satisfying conclusion.`;
 
     const result = await generateText({
       systemPrompt:
-        "You write short end-of-session debriefs for a productivity app. Use the tasks, timers, and session events for specific, personal details. Keep it warm, lightly witty, 2–3 sentences.",
+        "You are a sophisticated well being and productivity coach summarizing a user's remote work session. Synthesize their completed tasks, timer history, and recent interactions into a cohesive, warm, and lightly witty 2 to 3 sentence debrief. Focus on the value of their focused work and the balance they maintained. Output plain text only. CRITICAL: Do not use em dashes or spaced hyphens in your output.",
       userPrompt,
-      fallback: `Session complete. ${data.firedCount} timers, ${data.minutes} minutes. Nice work.`,
+      fallback: `Session complete: ${data.minutes} minutes of focus and ${data.firedCount} timers. Excellent balance of deep work and vital resets today.`,
       maxTokens: 500,
     });
 

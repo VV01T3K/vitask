@@ -23,18 +23,18 @@ function Dashboard() {
   const [, , sessionSnapshot] = Route.useLoaderData();
 
   const [sessionStartedAt, setSessionStartedAt] = useState(() => Date.now());
-  const [firedCount, setFiredCount] = useState(0);
-  const [snoozedCount, setSnoozedCount] = useState(0);
+  const [firedTimers, setFiredTimers] = useState<{ id: string; title: string }[]>([]);
+  const [snoozedTimers, setSnoozedTimers] = useState<{ id: string; title: string }[]>([]);
 
-  const handleTimerFired = useCallback((count: number) => {
-    setFiredCount((current) => current + count);
+  const handleTimerFired = useCallback((timers: { id: string; title: string }[]) => {
+    setFiredTimers((current) => [...current, ...timers]);
   }, []);
-  const handleTimerSnoozed = useCallback(() => {
-    setSnoozedCount((current) => current + 1);
+  const handleTimerSnoozed = useCallback((timer: { id: string; title: string }) => {
+    setSnoozedTimers((current) => [...current, timer]);
   }, []);
   const resetSession = useCallback(() => {
-    setFiredCount(0);
-    setSnoozedCount(0);
+    setFiredTimers([]);
+    setSnoozedTimers([]);
     setSessionStartedAt(Date.now());
   }, []);
 
@@ -43,10 +43,10 @@ function Dashboard() {
       <main className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 p-6">
         <SessionHeader sessionStartedAt={sessionStartedAt}>
           <SessionWrapUp
-            firedCount={firedCount}
+            firedTimers={firedTimers}
             onComplete={resetSession}
             sessionStartedAt={sessionStartedAt}
-            snoozedCount={snoozedCount}
+            snoozedTimers={snoozedTimers}
           />
         </SessionHeader>
 

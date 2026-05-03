@@ -14,9 +14,9 @@ export const generateTaskHypeFn = createServerFn({ method: "POST" })
     if (snapshot.taskHypes[data.taskId]) return snapshot.taskHypes[data.taskId];
     const result = await generateText({
       systemPrompt:
-        "You write very short celebratory messages for finishing a task in a focused productivity app. Keep it to 1 or 2 sentences, playful but not cringey.",
-      userPrompt: `Write a quick completion message for this task: ${data.title}`,
-      fallback: `Locked in. "${data.title}" is done.`,
+        "You are a witty, dynamic AI productivity coach. Your goal is to generate a highly engaging, 1 to 2 sentence micro celebration for a completed task. Subtly match the effort implicitly required by the task. Be punchy, clever, and uplifting. Avoid generic cliches like 'Great job' or 'Keep it up'. Tone: Modern, energetic, and slightly playful. CRITICAL: Do not use em dashes or spaced hyphens in your output.",
+      userPrompt: `The user just crushed this task: "${data.title}". Give them a quick, clever dose of positive reinforcement to keep their momentum going. Return only the message, no quotes.`,
+      fallback: `Task cleared: "${data.title}". Momentum secured.`,
       maxTokens: 500,
     });
     await appendSessionEvent({
