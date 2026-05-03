@@ -1,8 +1,13 @@
 import type { model } from "@vitask/backend-api";
-import { Clock, Lock, Sparkle } from "lucide-react";
+import { Lock, Pencil, Sparkle, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { useTypewriter } from "#/hooks/useTypewriter";
+import {
+  getTimerIconOption,
+  normalizeTimerAppearance,
+  type TimerAppearance,
+} from "#/lib/timerAppearance";
 import { durationSeconds, type Runtime } from "#/lib/timerRuntime";
 import { fmtTime } from "#/lib/timerUtils";
 
@@ -13,8 +18,11 @@ type TimerCardProps = {
   runtime: Runtime | undefined;
   remaining: number;
   alarmActive: boolean;
+  appearance: TimerAppearance;
   onFireDone: (id: string) => void;
   onSnooze: (id: string, seconds: number) => void;
+  onEdit: (timer: TimerResponse) => void;
+  onDelete: (id: string) => void;
 };
 
 type Particle = {
@@ -28,8 +36,11 @@ export function TimerCard({
   runtime,
   remaining,
   alarmActive,
+  appearance,
   onFireDone,
   onSnooze,
+  onEdit,
+  onDelete,
 }: TimerCardProps) {
   const isFiring = !!runtime?.firing;
   const sweeping = !!runtime?.sweeping;
@@ -37,6 +48,9 @@ export function TimerCard({
   const pct = Math.round(((timerDurationSeconds - remaining) / timerDurationSeconds) * 100);
   const warning = !isFiring && remaining <= 60 && remaining > 0;
   const [particles, setParticles] = useState<Particle[]>([]);
+  const resolvedAppearance = normalizeTimerAppearance(appearance);
+  const iconOption = getTimerIconOption(resolvedAppearance.icon);
+  const Icon = iconOption.Icon;
 
   const streamed = runtime?.message ?? "";
   const { text: typedText, done: typingDone } = useTypewriter(streamed, 8, isFiring);
@@ -57,27 +71,47 @@ export function TimerCard({
     <article
       className={
         alarmActive
-          ? "bg-vitask-surface border-vitask-coral vitask-alarm-ring relative rounded-md border px-4 py-3 shadow-[0_0_18px_rgba(230,95,84,0.22)]"
+          ? "group bg-vitask-surface border-vitask-coral vitask-alarm-ring relative rounded-md border px-4 py-3 shadow-[0_0_18px_rgba(230,95,84,0.22)]"
           : isFiring
-            ? "bg-vitask-surface border-vitask-amber animate-vitask-pulse-border relative rounded-md border px-4 py-3 shadow-[0_0_12px_rgba(252,196,69,0.18)]"
-            : "bg-vitask-surface border-vitask-border hover:border-vitask-border-bright relative rounded-md border px-4 py-3 transition-colors"
+            ? "group bg-vitask-surface border-vitask-amber animate-vitask-pulse-border relative rounded-md border px-4 py-3 shadow-[0_0_12px_rgba(252,196,69,0.18)]"
+            : "group bg-vitask-surface border-vitask-border hover:border-vitask-border-bright relative rounded-md border px-4 py-3 transition-colors"
       }
     >
-      <div className="mb-1.5 flex items-center gap-2.5">
-        <span className="text-vitask-text-secondary leading-none">
-          <Clock aria-hidden="true" size={16} />
+      <div className="mb-1.5 flex min-w-0 items-center gap-2.5">
+        <span className="shrink-0 leading-none" style={{ color: resolvedAppearance.color }}>
+          <Icon aria-hidden="true" size={16} />
         </span>
-        <span className="text-vitask-text-primary inline-flex flex-1 items-center gap-1.5 text-[13px] font-medium">
+        <span className="text-vitask-text-primary inline-flex min-w-0 flex-1 items-center gap-1.5 truncate text-[13px] font-medium">
           {timer.title}
           {timer.isDefault ? (
             <span
               className="text-vitask-text-tertiary text-[10px] opacity-70"
-              title="default — can edit, can't delete"
+              title="built-in timer"
             >
               <Lock aria-hidden="true" className="text-vitask-text-tertiary" size={10} />
             </span>
           ) : null}
         </span>
+        {!timer.isDefault ? (
+          <>
+            <button
+              aria-label="Edit timer"
+              className="text-vitask-text-secondary hover:text-vitask-accent hover:bg-vitask-accent/10 hover:border-vitask-accent/30 hidden h-7 w-7 items-center justify-center rounded border border-transparent transition group-hover:inline-flex"
+              onClick={() => onEdit(timer)}
+              type="button"
+            >
+              <Pencil aria-hidden="true" size={14} />
+            </button>
+            <button
+              aria-label="Delete timer"
+              className="text-vitask-text-secondary hover:text-vitask-coral hover:bg-vitask-coral/10 hover:border-vitask-coral/30 hidden h-7 w-7 items-center justify-center rounded border border-transparent transition group-hover:inline-flex"
+              onClick={() => onDelete(timer.id)}
+              type="button"
+            >
+              <Trash2 aria-hidden="true" size={14} />
+            </button>
+          </>
+        ) : null}
         <span
           className={
             alarmActive
@@ -170,7 +204,7 @@ export function TimerCard({
                   ? "vitask-progress-sweep h-full rounded-sm"
                   : "h-full rounded-sm transition-[width] duration-500 ease-linear"
               }
-              style={{ width: `${pct}%` }}
+              style={{ width: `${pct}%`, backgroundColor: resolvedAppearance.color }}
             />
             <span className="font-vitask-mono text-vitask-text-tertiary absolute -top-4 right-0 text-[10px]">
               {pct}%

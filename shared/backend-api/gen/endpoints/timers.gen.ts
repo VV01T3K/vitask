@@ -18,7 +18,11 @@ import type {
 } from "@tanstack/react-query";
 
 import { TimerResponse } from "../model";
-import type { CreateTimerRequest, HttpValidationProblemDetails } from "../model";
+import type {
+  CreateTimerRequest,
+  HttpValidationProblemDetails,
+  UpdateTimerRequest,
+} from "../model";
 
 /**
  * @summary Create a timer
@@ -247,3 +251,226 @@ export function useListTimersSuspense<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Update a timer
+ */
+export type updateTimerResponse200 = {
+  data: TimerResponse;
+  status: 200;
+};
+
+export type updateTimerResponse400 = {
+  data: HttpValidationProblemDetails;
+  status: 400;
+};
+
+export type updateTimerResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateTimerResponseSuccess = updateTimerResponse200 & {
+  headers: Headers;
+};
+export type updateTimerResponseError = (updateTimerResponse400 | updateTimerResponse404) & {
+  headers: Headers;
+};
+
+export const getUpdateTimerUrl = (id: string) => {
+  return `http://localhost:5107/timers/${id}`;
+};
+
+export const updateTimer = async (
+  id: string,
+  updateTimerRequest: UpdateTimerRequest,
+  options?: RequestInit,
+): Promise<updateTimerResponseSuccess> => {
+  const res = await fetch(getUpdateTimerUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateTimerRequest),
+  });
+
+  const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: updateTimerResponseError["data"]; status?: number } =
+      new globalThis.Error();
+    const data: updateTimerResponseError["data"] = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
+  const parsedBody = body ? (contentType.includes("json") ? JSON.parse(body) : body) : {};
+  const data = contentType.includes("json") ? TimerResponse.parse(parsedBody) : parsedBody;
+  return { data, status: res.status, headers: res.headers } as updateTimerResponseSuccess;
+};
+
+export const getUpdateTimerMutationOptions = <
+  TError = HttpValidationProblemDetails | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateTimer>>,
+    TError,
+    { id: string; data: UpdateTimerRequest },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateTimer>>,
+  TError,
+  { id: string; data: UpdateTimerRequest },
+  TContext
+> => {
+  const mutationKey = ["updateTimer"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateTimer>>,
+    { id: string; data: UpdateTimerRequest }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateTimer(id, data, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateTimerMutationResult = NonNullable<Awaited<ReturnType<typeof updateTimer>>>;
+export type UpdateTimerMutationBody = UpdateTimerRequest;
+export type UpdateTimerMutationError = HttpValidationProblemDetails | void;
+
+/**
+ * @summary Update a timer
+ */
+export const useUpdateTimer = <TError = HttpValidationProblemDetails | void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateTimer>>,
+      TError,
+      { id: string; data: UpdateTimerRequest },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateTimer>>,
+  TError,
+  { id: string; data: UpdateTimerRequest },
+  TContext
+> => {
+  return useMutation(getUpdateTimerMutationOptions(options), queryClient);
+};
+/**
+ * @summary Delete a timer
+ */
+export type deleteTimerResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteTimerResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type deleteTimerResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type deleteTimerResponseSuccess = deleteTimerResponse204 & {
+  headers: Headers;
+};
+export type deleteTimerResponseError = (deleteTimerResponse404 | deleteTimerResponse409) & {
+  headers: Headers;
+};
+
+export const getDeleteTimerUrl = (id: string) => {
+  return `http://localhost:5107/timers/${id}`;
+};
+
+export const deleteTimer = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteTimerResponseSuccess> => {
+  const res = await fetch(getDeleteTimerUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: deleteTimerResponseError["data"]; status?: number } =
+      new globalThis.Error();
+    const data: deleteTimerResponseError["data"] = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
+  const data: deleteTimerResponseSuccess["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteTimerResponseSuccess;
+};
+
+export const getDeleteTimerMutationOptions = <TError = void, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteTimer>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteTimer>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteTimer"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTimer>>, { id: string }> = (
+    props,
+  ) => {
+    const { id } = props ?? {};
+
+    return deleteTimer(id, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteTimerMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTimer>>>;
+
+export type DeleteTimerMutationError = void;
+
+/**
+ * @summary Delete a timer
+ */
+export const useDeleteTimer = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteTimer>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof deleteTimer>>, TError, { id: string }, TContext> => {
+  return useMutation(getDeleteTimerMutationOptions(options), queryClient);
+};

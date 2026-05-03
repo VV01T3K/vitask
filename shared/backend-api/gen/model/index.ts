@@ -14,3 +14,5 @@ export * from "./setTaskCompletionBody.zod";
 export * from "./setTaskCompletionRequest.zod";
 export * from "./taskResponse.zod";
 export * from "./timerResponse.zod";
+export * from "./updateTimerBody.zod";
+export * from "./updateTimerRequest.zod";

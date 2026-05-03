@@ -17,6 +17,8 @@ export const TimerResponse = zod.object({
     zod.stringFormat("int32", timerResponseDurationSecondsRegExpTwo),
   ]),
   aiInstructions: zod.string(),
+  icon: zod.string(),
+  color: zod.string(),
   isDefault: zod.boolean(),
   createdAt: zod.iso.datetime({ offset: true }),
 });

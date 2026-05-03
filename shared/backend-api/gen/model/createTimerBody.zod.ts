@@ -37,6 +37,8 @@ export const CreateTimerBody = zod.object({
     ])
     .optional(),
   aiInstructions: zod.string().min(1).max(createTimerBodyAiInstructionsMax),
+  icon: zod.string().nullish(),
+  color: zod.string().nullish(),
 });
 
 export type CreateTimerBody = zod.input<typeof CreateTimerBody>;

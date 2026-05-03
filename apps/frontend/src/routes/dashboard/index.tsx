@@ -12,6 +12,7 @@ import { generateWrapUpFn } from "#/functions/wrapup.functions";
 import { useTimerAlerts } from "#/hooks/useTimerAlerts";
 import { getSessionSnapshotFn } from "#/integrations/durable-streams/session.functions";
 import { useAppForm } from "#/integrations/tanstack/form";
+import { normalizeTimerAppearance, type TimerIconKey } from "#/lib/timerAppearance";
 import {
   createRuntime,
   durationSeconds,
@@ -20,7 +21,7 @@ import {
   type Runtimes,
 } from "#/lib/timerRuntime";
 
-import { CreateTimerModal } from "./-componets/CreateTimerModal";
+import { CreateTimerModal, type TimerSubmitValues } from "./-componets/CreateTimerModal";
 import { TaskItem } from "./-componets/TaskItem";
 import { TimerCard } from "./-componets/TimerCard";
 import { WrapUpModal } from "./-componets/WrapUpModal.tsx";
@@ -67,8 +68,11 @@ function Dashboard() {
   const [, , sessionSnapshot] = Route.useLoaderData();
   const createTask = api.useCreateTask();
   const createTimer = api.useCreateTimer();
+  const updateTimer = api.useUpdateTimer();
+  const deleteTimer = api.useDeleteTimer();
   const deleteTask = api.useDeleteTask();
   const setTaskCompletion = api.useSetTaskCompletion();
+  const wrapUpTasks = api.useWrapUpTasks();
   const generateTaskHype = useServerFn(generateTaskHypeFn);
   const generateTimerNudge = useServerFn(generateTimerNudgeFn);
   const generateWrapUp = useServerFn(generateWrapUpFn);
@@ -79,6 +83,7 @@ function Dashboard() {
   const [runtimes, setRuntimes] = useState<Runtimes>({});
   const [now, setNow] = useState(() => Date.now());
   const [showCreateTimer, setShowCreateTimer] = useState(false);
+  const [editingTimer, setEditingTimer] = useState<TimerResponse | null>(null);
   const [showWrapUp, setShowWrapUp] = useState(false);
   const [wrapText, setWrapText] = useState("");
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
@@ -348,12 +353,8 @@ function Dashboard() {
       description,
       durationSeconds: nextDurationSeconds,
       aiInstructions,
-    }: {
-      title: string;
-      description: string;
-      durationSeconds: number;
-      aiInstructions: string;
-    }) => {
+      appearance,
+    }: TimerSubmitValues) => {
       try {
         const response = await createTimer.mutateAsync({
           data: {
@@ -361,6 +362,8 @@ function Dashboard() {
             description,
             durationSeconds: nextDurationSeconds,
             aiInstructions,
+            icon: appearance.icon,
+            color: appearance.color,
           },
         });
 
@@ -379,23 +382,74 @@ function Dashboard() {
     [createTimer, queryClient],
   );
 
+  const handleEditTimer = useCallback(
+    async ({
+      title,
+      description,
+      durationSeconds: nextDurationSeconds,
+      aiInstructions,
+      appearance,
+    }: TimerSubmitValues) => {
+      if (!editingTimer) return false;
+      const durationChanged = durationSeconds(editingTimer) !== nextDurationSeconds;
+      try {
+        await updateTimer.mutateAsync({
+          id: editingTimer.id,
+          data: {
+            title,
+            description,
+            durationSeconds: nextDurationSeconds,
+            aiInstructions,
+            icon: appearance.icon,
+            color: appearance.color,
+          },
+        });
+        if (durationChanged) {
+          setRuntimes((previous) => ({
+            ...previous,
+            [editingTimer.id]: createRuntime(nextDurationSeconds),
+          }));
+        }
+        await queryClient.invalidateQueries({ queryKey: api.getListTimersQueryKey() });
+        return true;
+      } catch (error) {
+        toast.error(getErrorMessage(error, "The backend could not update the timer."));
+        return false;
+      }
+    },
+    [editingTimer, queryClient, updateTimer],
+  );
+
+  const handleDeleteTimer = useCallback(
+    async (id: string) => {
+      try {
+        await deleteTimer.mutateAsync({ id });
+        await queryClient.invalidateQueries({ queryKey: api.getListTimersQueryKey() });
+      } catch (error) {
+        toast.error(getErrorMessage(error, "The backend could not delete the timer."));
+      }
+    },
+    [deleteTimer, queryClient],
+  );
+
   const handleWrapUp = useCallback(async () => {
     setShowWrapUp(true);
     setWrapText("...");
 
     const minutes = Math.floor((now - sessionStartRef.current) / 60000);
+    const sessionTasks = await wrapUpTasks.mutateAsync();
     const text = await generateWrapUp({
       data: {
         firedCount,
         snoozedCount,
         minutes,
-        tasks: tasks.map((t) => ({ title: t.title, isCompleted: t.isCompleted })),
+        tasks: sessionTasks.data.map((t) => ({ title: t.title, isCompleted: t.isCompleted })),
         timers: timers.map((t) => ({ title: t.title, description: t.description })),
       },
     });
 
     setWrapText(text);
-  }, [firedCount, generateWrapUp, now, snoozedCount, tasks, timers]);
+  }, [firedCount, generateWrapUp, now, snoozedCount, timers, wrapUpTasks]);
 
   const firingAlarmTimer = timers.find((timer) => runtimes[timer.id]?.firing);
 
@@ -462,6 +516,8 @@ function Dashboard() {
             activeAlarmId={activeOwnerId}
             now={now}
             onAdd={() => setShowCreateTimer(true)}
+            onDelete={handleDeleteTimer}
+            onEdit={setEditingTimer}
             onFireDone={fireDone}
             onSnooze={snoozeTimer}
             runtimes={runtimes}
@@ -479,8 +535,21 @@ function Dashboard() {
         }
         isSubmitting={createTimer.isPending}
         onClose={() => setShowCreateTimer(false)}
-        onCreate={handleCreateTimer}
+        onSubmit={handleCreateTimer}
         open={showCreateTimer}
+      />
+      <CreateTimerModal
+        activeTaskTitles={activeTasks.map((task) => task.title)}
+        errorMessage={
+          updateTimer.error
+            ? getErrorMessage(updateTimer.error, "The timer could not be updated.")
+            : null
+        }
+        isSubmitting={updateTimer.isPending}
+        onClose={() => setEditingTimer(null)}
+        onSubmit={handleEditTimer}
+        open={editingTimer !== null}
+        timer={editingTimer ?? undefined}
       />
       <WrapUpModal
         debriefText={wrapText}
@@ -757,6 +826,8 @@ type TimersPanelProps = {
   onAdd: () => void;
   onFireDone: (id: string) => void;
   onSnooze: (id: string, seconds: number) => void;
+  onEdit: (timer: TimerResponse) => void;
+  onDelete: (id: string) => void;
 };
 
 function TimersPanel({
@@ -767,18 +838,26 @@ function TimersPanel({
   onAdd,
   onFireDone,
   onSnooze,
+  onEdit,
+  onDelete,
 }: TimersPanelProps) {
   return (
-    <section className="flex min-h-0 flex-col gap-3">
+    <section className="flex min-h-0 min-w-0 flex-col gap-3">
       <div className="text-vitask-text-tertiary mb-1 text-[11px] font-medium tracking-[0.08em] uppercase">
-        timers
+        care timers
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2">
         {timers.map((timer) => (
           <TimerCard
             alarmActive={activeAlarmId === timer.id}
+            appearance={normalizeTimerAppearance({
+              icon: timer.icon as TimerIconKey,
+              color: timer.color,
+            })}
             key={timer.id}
+            onDelete={onDelete}
+            onEdit={onEdit}
             onFireDone={onFireDone}
             onSnooze={onSnooze}
             remaining={getRemainingSeconds(runtimes[timer.id], durationSeconds(timer), now)}

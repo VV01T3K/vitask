@@ -27,6 +27,8 @@ public sealed class VitaskDbContext(DbContextOptions<VitaskDbContext> options) :
             entity.Property(timer => timer.Description).HasMaxLength(240).IsRequired();
             entity.Property(timer => timer.DurationSeconds).IsRequired();
             entity.Property(timer => timer.AiInstructions).HasMaxLength(1_000).IsRequired();
+            entity.Property(timer => timer.Icon).HasMaxLength(64).IsRequired();
+            entity.Property(timer => timer.Color).HasMaxLength(16).IsRequired();
             entity.Property(timer => timer.IsDefault).IsRequired();
             entity.Property(timer => timer.CreatedAt).IsRequired();
         });
@@ -43,6 +45,8 @@ public sealed class TaskItem
 
     public DateTimeOffset? CompletedAt { get; set; }
 
+    public DateTimeOffset? WrappedUpAt { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; }
 }
 
@@ -57,6 +61,10 @@ public sealed class TimerDefinition
     public int DurationSeconds { get; set; }
 
     public required string AiInstructions { get; set; }
+
+    public required string Icon { get; set; }
+
+    public required string Color { get; set; }
 
     public bool IsDefault { get; set; }
 
@@ -110,6 +118,8 @@ public static class DatabaseExtensions
                 DurationSeconds = 60 * 60,
                 AiInstructions =
                     "When this fires, remind me to drink water. Keep it punchy, warm, and energizing.",
+                Icon = "hydration",
+                Color = "#4f8fea",
                 IsDefault = true,
                 CreatedAt = now,
             },
@@ -121,6 +131,8 @@ public static class DatabaseExtensions
                 DurationSeconds = 20 * 60,
                 AiInstructions =
                     "When this fires, remind me to look 20 feet away for 20 seconds and reset my eyes.",
+                Icon = "sun",
+                Color = "#41b06e",
                 IsDefault = true,
                 CreatedAt = now,
             }

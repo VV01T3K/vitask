@@ -137,6 +137,10 @@ public static class TaskEndpoints
 
                     task.IsCompleted = request.IsCompleted;
                     task.CompletedAt = request.IsCompleted ? DateTimeOffset.UtcNow : null;
+                    if (!request.IsCompleted)
+                    {
+                        task.WrappedUpAt = null;
+                    }
 
                     await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -148,6 +152,38 @@ public static class TaskEndpoints
             .WithFluentValidation<SetTaskCompletionRequest>()
             .Produces<TaskResponse>()
             .Produces(StatusCodes.Status404NotFound);
+
+        tasks
+            .MapPost(
+                "/wrap-up",
+                async (VitaskDbContext dbContext, CancellationToken cancellationToken) =>
+                {
+                    var sessionTasks = await dbContext
+                        .Tasks.Where(task => task.WrappedUpAt == null)
+                        .ToListAsync(cancellationToken);
+
+                    var wrappedAt = DateTimeOffset.UtcNow;
+                    foreach (var task in sessionTasks)
+                    {
+                        if (task.IsCompleted)
+                        {
+                            task.WrappedUpAt = wrappedAt;
+                        }
+                    }
+
+                    await dbContext.SaveChangesAsync(cancellationToken);
+
+                    return sessionTasks
+                        .OrderBy(task => task.IsCompleted)
+                        .ThenByDescending(task => task.CreatedAt)
+                        .ThenBy(task => task.Id)
+                        .Select(task => task.ToResponse())
+                        .ToArray();
+                }
+            )
+            .WithName("WrapUpTasks")
+            .WithSummary("Mark current completed tasks as wrapped up and return the session batch")
+            .Produces<TaskResponse[]>();
 
         tasks
             .MapDelete(

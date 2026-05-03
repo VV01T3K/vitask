@@ -590,3 +590,71 @@ export const useSetTaskCompletion = <TError = void, TContext = unknown>(
 > => {
   return useMutation(getSetTaskCompletionMutationOptions(options), queryClient);
 };
+/**
+ * @summary Mark current completed tasks as wrapped up and return the session batch
+ */
+export type wrapUpTasksResponse200 = {
+  data: TaskResponse[];
+  status: 200;
+};
+
+export type wrapUpTasksResponseSuccess = wrapUpTasksResponse200 & {
+  headers: Headers;
+};
+
+export const getWrapUpTasksUrl = () => {
+  return `http://localhost:5107/tasks/wrap-up`;
+};
+
+export const wrapUpTasks = async (options?: RequestInit): Promise<wrapUpTasksResponseSuccess> => {
+  const res = await fetch(getWrapUpTasksUrl(), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  if (!res.ok) {
+    const err: globalThis.Error & { info?: any; status?: number } = new globalThis.Error();
+    const data = body ? JSON.parse(body) : {};
+    err.info = data;
+    err.status = res.status;
+    throw err;
+  }
+  const data: wrapUpTasksResponseSuccess["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as wrapUpTasksResponseSuccess;
+};
+
+export const getWrapUpTasksMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof wrapUpTasks>>, TError, void, TContext>;
+  fetch?: RequestInit;
+}): UseMutationOptions<Awaited<ReturnType<typeof wrapUpTasks>>, TError, void, TContext> => {
+  const mutationKey = ["wrapUpTasks"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrapUpTasks>>, void> = () => {
+    return wrapUpTasks(fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type WrapUpTasksMutationResult = NonNullable<Awaited<ReturnType<typeof wrapUpTasks>>>;
+
+export type WrapUpTasksMutationError = unknown;
+
+/**
+ * @summary Mark current completed tasks as wrapped up and return the session batch
+ */
+export const useWrapUpTasks = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof wrapUpTasks>>, TError, void, TContext>;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof wrapUpTasks>>, TError, void, TContext> => {
+  return useMutation(getWrapUpTasksMutationOptions(options), queryClient);
+};
