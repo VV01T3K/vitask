@@ -30,7 +30,7 @@ public sealed class CreateTimerRequestValidator : AbstractValidator<CreateTimerR
     {
         RuleFor(timer => timer.Title).NotEmpty().Length(2, 120);
         RuleFor(timer => timer.Description).NotEmpty().MaximumLength(240);
-        RuleFor(timer => timer.DurationSeconds).InclusiveBetween(60, 24 * 60 * 60);
+        RuleFor(timer => timer.DurationSeconds).InclusiveBetween(15, 24 * 60 * 60);
         RuleFor(timer => timer.AiInstructions).NotEmpty().MaximumLength(1_000);
     }
 }

@@ -1,10 +1,10 @@
 import type { model } from "@vitask/backend-api";
-import { Clock, Coffee, Droplet, Eye, Flower2, Footprints, Sparkle, Wind } from "lucide-react";
+import { Clock, Lock, Sparkle } from "lucide-react";
 import { useState } from "react";
-import type { ReactNode } from "react";
 
-import { durationSeconds, type Runtime } from "./vitask.data";
-import { fmtTime, pickIcon, useTypewriter, type TimerIcon } from "./vitask.helpers";
+import { useTypewriter } from "#/hooks/useTypewriter";
+import { durationSeconds, type Runtime } from "#/lib/timerRuntime";
+import { fmtTime } from "#/lib/timerUtils";
 
 type TimerResponse = model.TimerResponse;
 
@@ -12,7 +12,6 @@ type TimerCardProps = {
   timer: TimerResponse;
   runtime: Runtime | undefined;
   remaining: number;
-  accentColor: string;
   alarmActive: boolean;
   onFireDone: (id: string) => void;
   onSnooze: (id: string, seconds: number) => void;
@@ -24,33 +23,10 @@ type Particle = {
   dy: number;
 };
 
-function TimerIconGlyph({ name }: { name: TimerIcon }): ReactNode {
-  const props = { "aria-hidden": "true" as const, size: 16 };
-  switch (name) {
-    case "droplet":
-      return <Droplet {...props} />;
-    case "eye":
-      return <Eye {...props} />;
-    case "posture":
-      return <Flower2 {...props} />;
-    case "stretch":
-      return <Flower2 {...props} />;
-    case "walk":
-      return <Footprints {...props} />;
-    case "breath":
-      return <Wind {...props} />;
-    case "snack":
-      return <Coffee {...props} />;
-    default:
-      return <Clock {...props} />;
-  }
-}
-
 export function TimerCard({
   timer,
   runtime,
   remaining,
-  accentColor,
   alarmActive,
   onFireDone,
   onSnooze,
@@ -62,9 +38,8 @@ export function TimerCard({
   const warning = !isFiring && remaining <= 60 && remaining > 0;
   const [particles, setParticles] = useState<Particle[]>([]);
 
-  const rawMessage = runtime?.message ?? "";
-  const isLoading = !rawMessage || rawMessage === "...";
-  const { text: streamed, done } = useTypewriter(rawMessage, undefined, !isLoading);
+  const streamed = runtime?.message ?? "";
+  const { text: typedText, done: typingDone } = useTypewriter(streamed, 8, isFiring);
 
   function handleDone() {
     const baseId = Date.now();
@@ -87,11 +62,10 @@ export function TimerCard({
             ? "bg-vitask-surface border-vitask-amber animate-vitask-pulse-border relative rounded-md border px-4 py-3 shadow-[0_0_12px_rgba(252,196,69,0.18)]"
             : "bg-vitask-surface border-vitask-border hover:border-vitask-border-bright relative rounded-md border px-4 py-3 transition-colors"
       }
-      style={{ "--vitask-accent-color": accentColor } as React.CSSProperties}
     >
       <div className="mb-1.5 flex items-center gap-2.5">
         <span className="text-vitask-text-secondary leading-none">
-          <TimerIconGlyph name={pickIcon(timer.title)} />
+          <Clock aria-hidden="true" size={16} />
         </span>
         <span className="text-vitask-text-primary inline-flex flex-1 items-center gap-1.5 text-[13px] font-medium">
           {timer.title}
@@ -100,7 +74,7 @@ export function TimerCard({
               className="text-vitask-text-tertiary text-[10px] opacity-70"
               title="default — can edit, can't delete"
             >
-              🔒
+              <Lock aria-hidden="true" className="text-vitask-text-tertiary" size={10} />
             </span>
           ) : null}
         </span>
@@ -142,8 +116,8 @@ export function TimerCard({
               AI
             </span>
             <span className="min-w-0 flex-1">
-              {streamed}
-              {!done ? (
+              {typedText}
+              {!typingDone ? (
                 <span aria-hidden="true" className="animate-vitask-blink ml-0.5 inline-block">
                   ▍
                 </span>
@@ -196,7 +170,7 @@ export function TimerCard({
                   ? "vitask-progress-sweep h-full rounded-sm"
                   : "h-full rounded-sm transition-[width] duration-500 ease-linear"
               }
-              style={{ width: `${pct}%`, backgroundColor: accentColor }}
+              style={{ width: `${pct}%` }}
             />
             <span className="font-vitask-mono text-vitask-text-tertiary absolute -top-4 right-0 text-[10px]">
               {pct}%

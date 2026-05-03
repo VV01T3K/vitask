@@ -5,11 +5,11 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
 
-import Header from "../components/Header";
-import { useSuppressLocalDurableStreamWarning } from "../integrations/durable-streams/suppress-no-https-warning";
-import TanStackQueryDevtools from "../integrations/tanstack/query/devtools";
+import Header from "#/components/Header";
+import { useSuppressLocalDurableStreamWarning } from "#/integrations/durable-streams/useSuppressLocalDurableStreamWarning";
+import TanStackQueryDevtools from "#/integrations/tanstack/query/devtools";
 
-import appCss from "../styles.css?url";
+import appCss from "#/styles.css?url";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -45,7 +45,7 @@ function NotFound() {
     <main>
       <h1>Page not found</h1>
       <p>The page you requested does not exist.</p>
-      <Link to="/">Go home</Link>
+      <Link to="/dashboard">Go home</Link>
     </main>
   );
 }
@@ -66,8 +66,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           enableColorScheme
           enableSystem
         >
-          <Header />
-          {children}
+          <div className="flex h-screen flex-col">
+            <Header />
+            <div className="flex-1 overflow-y-auto">{children}</div>
+          </div>
           <AppToaster />
           <TanStackDevtools
             config={{
@@ -94,9 +96,9 @@ function AppToaster() {
   return (
     <Toaster
       duration={5000}
-      mobileOffset={{ top: 72, left: 16, right: 16 }}
-      offset={{ top: 80, right: 24 }}
-      position="top-right"
+      mobileOffset={{ bottom: 80, left: 16, right: 16 }}
+      offset={{ bottom: 24, left: 24 }}
+      position="bottom-left"
       theme={resolvedTheme === "dark" ? "dark" : "light"}
       toastOptions={{
         classNames: {

@@ -6,26 +6,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { CreateTimerModal } from "../components/vitask/CreateTimerModal";
-import { TaskItem } from "../components/vitask/TaskItem";
-import { TimerCard } from "../components/vitask/TimerCard";
-import { useTimerAlerts } from "../components/vitask/useTimerAlerts";
+import { generateTaskHypeFn } from "#/functions/task.functions";
+import { generateTimerNudgeFn } from "#/functions/timer.functions";
+import { generateWrapUpFn } from "#/functions/wrapup.functions";
+import { useTimerAlerts } from "#/hooks/useTimerAlerts";
+import { getSessionSnapshotFn } from "#/integrations/durable-streams/session.functions";
+import { useAppForm } from "#/integrations/tanstack/form";
 import {
   createRuntime,
   durationSeconds,
   getRemainingSeconds,
   syncRuntimesWithTimers,
   type Runtimes,
-} from "../components/vitask/vitask.data";
-import { accentFor } from "../components/vitask/vitask.helpers";
-import { WrapUpModal } from "../components/vitask/WrapUpModal";
-import { getSessionSnapshotFn } from "../integrations/tanstack/ai/session.functions";
-import {
-  generateTaskHypeFn,
-  generateTimerNudgeFn,
-  generateWrapUpFn,
-} from "../integrations/tanstack/ai/vitask.functions";
-import { useAppForm } from "../integrations/tanstack/form";
+} from "#/lib/timerRuntime";
+
+import { CreateTimerModal } from "./-componets/CreateTimerModal";
+import { TaskItem } from "./-componets/TaskItem";
+import { TimerCard } from "./-componets/TimerCard";
+import { WrapUpModal } from "./-componets/WrapUpModal.tsx";
 
 const taskFormSchema = z
   .object({
@@ -48,7 +46,7 @@ type TaskFormValues = z.input<typeof taskFormSchema>;
 type TaskResponse = model.TaskResponse;
 type TimerResponse = model.TimerResponse;
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/dashboard/")({
   loader: ({ context: { queryClient } }) =>
     Promise.all([
       queryClient.ensureQueryData(api.getListTasksSuspenseQueryOptions()),
@@ -63,7 +61,7 @@ function isTimerPageActive() {
 }
 
 function Dashboard() {
-  const { queryClient } = useRouteContext({ from: "/" });
+  const { queryClient } = useRouteContext({ from: "/dashboard/" });
   const { data: tasksResponse } = api.useListTasksSuspense();
   const { data: timersResponse } = api.useListTimersSuspense();
   const [, , sessionSnapshot] = Route.useLoaderData();
@@ -219,27 +217,27 @@ function Dashboard() {
           },
         });
 
-        const hype = await generateTaskHype({
+        await queryClient.invalidateQueries({ queryKey: api.getListTasksQueryKey() });
+
+        void generateTaskHype({
           data: {
             title: response.data.title,
             taskId: id,
             taskTitle: response.data.title,
           },
+        }).then((hype: string) => {
+          setTaskHypeById((previous) => ({
+            ...previous,
+            [id]: hype,
+          }));
+
+          toast.custom(
+            (toastId) => (
+              <TaskHypeToast message={hype} taskTitle={response.data.title} toastId={toastId} />
+            ),
+            { duration: 5000 },
+          );
         });
-
-        setTaskHypeById((previous) => ({
-          ...previous,
-          [id]: hype,
-        }));
-
-        toast.custom(
-          (toastId) => (
-            <TaskHypeToast message={hype} taskTitle={response.data.title} toastId={toastId} />
-          ),
-          { duration: 5000 },
-        );
-
-        await queryClient.invalidateQueries({ queryKey: api.getListTasksQueryKey() });
       } catch (error) {
         toast.error(getErrorMessage(error, "The backend could not update the task."));
       }
@@ -421,11 +419,15 @@ function Dashboard() {
     });
 
   return (
-    <div className="vitask-surface font-vitask-body text-vitask-text-primary min-h-screen">
+    <div className="vitask-surface font-vitask-body text-vitask-text-primary min-h-full">
       <main className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 p-6">
         <section className="border-vitask-border bg-vitask-surface flex flex-wrap items-center justify-between gap-3 rounded-md border px-4 py-3">
           <div className="flex items-center gap-4">
-            <span className="font-vitask-mono text-vitask-text-tertiary text-[11px] tracking-[0.12em] uppercase">
+            <span className="font-vitask-mono text-vitask-text-tertiary flex items-center gap-3 text-[11px] tracking-[0.12em] uppercase">
+              <span className="relative flex h-2 w-2">
+                <span className="bg-vitask-accent absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+                <span className="bg-vitask-accent relative inline-flex h-2 w-2 rounded-full" />
+              </span>
               live session
             </span>
             <span className="text-vitask-text-secondary text-sm">{activeTasks.length} active</span>
@@ -676,29 +678,37 @@ function AddTaskInput({
             <>
               <form.Subscribe selector={(state) => ({ isSubmitting: state.isSubmitting })}>
                 {({ isSubmitting }) => (
-                  <div className="bg-vitask-elevated border-vitask-border focus-within:border-vitask-accent flex h-11 items-center gap-2.5 rounded-md border px-3.5 transition-colors">
-                    <span className="font-vitask-mono text-vitask-text-tertiary text-base select-none">
-                      +
-                    </span>
-                    <input
-                      autoFocus
-                      className="placeholder:text-vitask-text-tertiary text-vitask-text-primary flex-1 border-none bg-transparent text-sm outline-none disabled:opacity-50"
+                  <div className="flex items-center gap-2">
+                    <div className="bg-vitask-surface border-vitask-border focus-within:border-vitask-accent flex h-11 flex-1 items-center gap-2.5 rounded-md border px-3.5 transition-colors">
+                      <input
+                        autoFocus
+                        className="placeholder:text-vitask-text-tertiary text-vitask-text-primary flex-1 border-none bg-transparent text-sm outline-none disabled:opacity-50"
+                        disabled={disabled || isSubmitting}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(event) => {
+                          if (serverError) {
+                            setServerError(null);
+                          }
+                          field.handleChange(event.target.value);
+                        }}
+                        placeholder="What are you working on..."
+                        type="text"
+                        value={field.state.value}
+                      />
+                    </div>
+                    <button
+                      aria-label="Add task"
+                      className="bg-vitask-accent/15 border-vitask-accent/40 hover:bg-vitask-accent/25 hover:border-vitask-accent text-vitask-accent inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border text-lg leading-none transition-colors select-none disabled:opacity-40"
                       disabled={disabled || isSubmitting}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={(event) => {
-                        if (serverError) {
-                          setServerError(null);
-                        }
-                        field.handleChange(event.target.value);
-                      }}
-                      placeholder="What are you working on..."
-                      type="text"
-                      value={field.state.value}
-                    />
-                    {disabled || isSubmitting ? (
-                      <Loader2 aria-hidden="true" className="animate-spin" size={14} />
-                    ) : null}
+                      type="submit"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 aria-hidden="true" className="animate-spin" size={14} />
+                      ) : (
+                        "+"
+                      )}
+                    </button>
                   </div>
                 )}
               </form.Subscribe>
@@ -767,7 +777,6 @@ function TimersPanel({
       <div className="flex flex-col gap-2">
         {timers.map((timer) => (
           <TimerCard
-            accentColor={accentFor(timer.title)}
             alarmActive={activeAlarmId === timer.id}
             key={timer.id}
             onFireDone={onFireDone}

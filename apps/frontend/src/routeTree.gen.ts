@@ -9,104 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTasksRouteImport } from './routes/demo.tasks'
-import { Route as DemoAiRouteImport } from './routes/demo.ai'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTasksRoute = DemoTasksRouteImport.update({
-  id: '/demo/tasks',
-  path: '/demo/tasks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiRoute = DemoAiRouteImport.update({
-  id: '/demo/ai',
-  path: '/demo/ai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/api/chat': typeof ApiChatRoute
-  '/demo/ai': typeof DemoAiRoute
-  '/demo/tasks': typeof DemoTasksRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/api/chat': typeof ApiChatRoute
-  '/demo/ai': typeof DemoAiRoute
-  '/demo/tasks': typeof DemoTasksRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/api/chat': typeof ApiChatRoute
-  '/demo/ai': typeof DemoAiRoute
-  '/demo/tasks': typeof DemoTasksRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/chat' | '/demo/ai' | '/demo/tasks'
+  fullPaths: '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/chat' | '/demo/ai' | '/demo/tasks'
-  id: '__root__' | '/' | '/api/chat' | '/demo/ai' | '/demo/tasks'
+  to: '/dashboard'
+  id: '__root__' | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ApiChatRoute: typeof ApiChatRoute
-  DemoAiRoute: typeof DemoAiRoute
-  DemoTasksRoute: typeof DemoTasksRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/tasks': {
-      id: '/demo/tasks'
-      path: '/demo/tasks'
-      fullPath: '/demo/tasks'
-      preLoaderRoute: typeof DemoTasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai': {
-      id: '/demo/ai'
-      path: '/demo/ai'
-      fullPath: '/demo/ai'
-      preLoaderRoute: typeof DemoAiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ApiChatRoute: ApiChatRoute,
-  DemoAiRoute: DemoAiRoute,
-  DemoTasksRoute: DemoTasksRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

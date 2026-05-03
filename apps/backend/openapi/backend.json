@@ -273,7 +273,7 @@
           },
           "durationSeconds": {
             "maximum": 86400,
-            "minimum": 60,
+            "minimum": 15,
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",

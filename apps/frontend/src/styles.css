@@ -21,7 +21,7 @@
   --color-vitask-teal: var(--vitask-teal);
 
   --animate-vitask-pulse-border: vitaskPulseBorder 1.6s ease-in-out infinite;
-  --animate-vitask-alarm-ring: vitaskAlarmRing 1s ease-in-out infinite;
+  --animate-vitask-alarm-ring: vitaskAlarmRing 1.2s ease-in-out infinite;
   --animate-vitask-blink: vitaskBlink 1s steps(2) infinite;
   --animate-vitask-bounce: vitaskBounce 0.32s ease-out;
   --animate-vitask-slide-in-top: vitaskSlideInTop 0.3s ease-out;
@@ -250,7 +250,7 @@
   }
 
   .vitask-alarm-ring {
-    animation: vitaskAlarmRing 1s ease-in-out infinite;
+    animation: vitaskAlarmRing 1.2s ease-in-out infinite;
   }
 
   .vitask-modal-backdrop {

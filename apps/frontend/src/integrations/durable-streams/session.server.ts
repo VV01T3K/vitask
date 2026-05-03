@@ -1,6 +1,6 @@
 import { DurableStream, DurableStreamError, stream } from "@durable-streams/client";
 
-import { getDurableStreamServerUrl } from "./stream-server.server";
+import { getDurableStreamServerUrl } from "#/integrations/durable-streams/stream-server.server";
 
 export type SessionEvent =
   | { type: "timer-nudge"; timerId: string; timerTitle: string; result: string }

@@ -1,6 +1,6 @@
 import { Sparkle } from "lucide-react";
 
-import { useTypewriter } from "./vitask.helpers";
+import { useTypewriter } from "#/hooks/useTypewriter";
 
 type WrapUpStats = {
   tasks: number;
@@ -31,7 +31,7 @@ export function WrapUpModal({ open, onClose, stats, debriefText }: WrapUpModalPr
 
   return (
     <div
-      className="vitask-modal-backdrop fixed inset-0 z-[100] flex items-end justify-center bg-[var(--vitask-backdrop)] backdrop-blur-[4px]"
+      className="vitask-modal-backdrop fixed inset-0 z-[100] flex items-end justify-center bg-[var(--vitask-backdrop)]"
       onClick={onClose}
     >
       <div

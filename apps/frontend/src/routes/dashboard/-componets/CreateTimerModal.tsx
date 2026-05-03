@@ -4,10 +4,9 @@ import { Loader2, Sparkle, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
-import { generateTimerInstructionsFn } from "#/integrations/tanstack/ai/vitask.functions";
+import { generateTimerInstructionsFn } from "#/functions/timer.functions";
+import { useTypewriter } from "#/hooks/useTypewriter";
 import { useAppForm } from "#/integrations/tanstack/form";
-
-import { useTypewriter } from "./vitask.helpers";
 
 const timerDurationMinMinutes = model.createTimerRequestDurationSecondsMinOne / 60;
 const timerDurationMaxMinutes = model.createTimerRequestDurationSecondsMaxOne / 60;
@@ -31,19 +30,9 @@ const timerFormSchema = z.object({
       model.createTimerRequestDescriptionMax,
       `Description must be at most ${model.createTimerRequestDescriptionMax} characters.`,
     ),
-  durationMinutes: z
-    .string()
-    .trim()
-    .min(1, "Duration is required.")
-    .refine((value) => Number.isFinite(Number(value)), "Enter a valid duration.")
-    .refine(
-      (value) => Number(value) * 60 >= model.createTimerRequestDurationSecondsMinOne,
-      `Duration must be at least ${timerDurationMinMinutes} minute${timerDurationMinMinutes === 1 ? "" : "s"}.`,
-    )
-    .refine(
-      (value) => Number(value) * 60 <= model.createTimerRequestDurationSecondsMaxOne,
-      `Duration must be ${timerDurationMaxMinutes} minutes or less.`,
-    ),
+  hours: z.string().trim().default("0"),
+  minutes: z.string().trim().default("30"),
+  seconds: z.string().trim().default("0"),
   aiInstructions: z
     .string()
     .trim()
@@ -65,7 +54,9 @@ type CreateTimerValues = {
 const defaultTimerFormValues: TimerFormValues = {
   title: "",
   description: "",
-  durationMinutes: "30",
+  hours: "0",
+  minutes: "30",
+  seconds: "0",
   aiInstructions: "",
 };
 
@@ -152,7 +143,7 @@ export function CreateTimerModal({
 
   return (
     <div
-      className="vitask-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center bg-[var(--vitask-backdrop)] backdrop-blur-[4px]"
+      className="vitask-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center bg-[var(--vitask-backdrop)]"
       onClick={onClose}
     >
       <div
@@ -204,30 +195,69 @@ export function CreateTimerModal({
               )}
             </form.AppField>
 
-            <form.AppField name="durationMinutes">
-              {(field) => (
-                <Field
-                  errors={field.state.meta.errors}
-                  label="Duration"
-                  touched={field.state.meta.isTouched}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <input
-                      className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent w-[90px] rounded border px-3 py-2.5 text-center text-sm transition-colors outline-none"
-                      disabled={isSubmitting}
-                      max={String(timerDurationMaxMinutes)}
-                      min={String(timerDurationMinMinutes)}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(event.target.value)}
-                      type="number"
-                      value={field.state.value}
-                    />
-                    <span className="text-vitask-text-secondary text-[13px]">minutes</span>
-                  </div>
-                </Field>
-              )}
-            </form.AppField>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
+                <span className="text-vitask-text-tertiary text-[11px] font-medium tracking-[0.08em] uppercase">
+                  Duration
+                </span>
+                <div className="flex items-center gap-2.5">
+                  <form.AppField name="hours">
+                    {(field) => (
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent w-[65px] rounded border px-2 py-2.5 text-center text-sm transition-colors outline-none"
+                          disabled={isSubmitting}
+                          max="99"
+                          min="0"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={(event) => field.handleChange(event.target.value)}
+                          type="number"
+                          value={field.state.value}
+                        />
+                        <span className="text-vitask-text-secondary text-[13px]">h</span>
+                      </div>
+                    )}
+                  </form.AppField>
+                  <form.AppField name="minutes">
+                    {(field) => (
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent w-[65px] rounded border px-2 py-2.5 text-center text-sm transition-colors outline-none"
+                          disabled={isSubmitting}
+                          max="59"
+                          min="0"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={(event) => field.handleChange(event.target.value)}
+                          type="number"
+                          value={field.state.value}
+                        />
+                        <span className="text-vitask-text-secondary text-[13px]">m</span>
+                      </div>
+                    )}
+                  </form.AppField>
+                  <form.AppField name="seconds">
+                    {(field) => (
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          className="bg-vitask-elevated border-vitask-border text-vitask-text-primary font-vitask-mono focus:border-vitask-accent w-[65px] rounded border px-2 py-2.5 text-center text-sm transition-colors outline-none"
+                          disabled={isSubmitting}
+                          max="59"
+                          min="0"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={(event) => field.handleChange(event.target.value)}
+                          type="number"
+                          value={field.state.value}
+                        />
+                        <span className="text-vitask-text-secondary text-[13px]">s</span>
+                      </div>
+                    )}
+                  </form.AppField>
+                </div>
+              </div>
+            </div>
 
             <form.AppField name="description">
               {(field) => (
@@ -314,7 +344,7 @@ export function CreateTimerModal({
                       Cancel
                     </button>
                     <button
-                      className="bg-vitask-accent border-vitask-accent inline-flex items-center gap-2 rounded border px-4 py-2 text-[13px] font-semibold text-zinc-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="bg-vitask-accent/15 border-vitask-accent/40 hover:bg-vitask-accent/25 hover:border-vitask-accent text-vitask-accent inline-flex items-center gap-2 rounded border px-4 py-2 text-[13px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={!canSubmit || generating || isStreaming || isSubmitting}
                       type="submit"
                     >
@@ -337,11 +367,27 @@ export function CreateTimerModal({
 function toCreateTimerRequest(values: TimerFormValues) {
   const title = values.title.trim();
   const description = values.description.trim();
-  const durationMinutes = Number(values.durationMinutes.trim());
+  const hours = Number(values.hours?.trim()) || 0;
+  const minutes = Number(values.minutes?.trim()) || 0;
+  const seconds = Number(values.seconds?.trim()) || 0;
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+  if (totalSeconds < model.createTimerRequestDurationSecondsMinOne) {
+    console.warn(
+      `Duration must be at least ${timerDurationMinMinutes} minute${timerDurationMinMinutes === 1 ? "" : "s"}.`,
+    );
+    return null;
+  }
+
+  if (totalSeconds > model.createTimerRequestDurationSecondsMaxOne) {
+    console.warn(`Duration must be ${timerDurationMaxMinutes} minutes or less.`);
+    return null;
+  }
+
   const nextRequest: CreateTimerValues = {
     title,
     description: description || `Check in for ${title}`,
-    durationSeconds: Math.round(durationMinutes * 60),
+    durationSeconds: totalSeconds,
     aiInstructions: values.aiInstructions.trim(),
   };
 

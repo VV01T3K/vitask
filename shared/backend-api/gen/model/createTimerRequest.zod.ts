@@ -11,12 +11,12 @@ export const createTimerRequestTitleMax = 120;
 
 export const createTimerRequestDescriptionMax = 240;
 
-export const createTimerRequestDurationSecondsMinOne = 60;
+export const createTimerRequestDurationSecondsMinOne = 15;
 export const createTimerRequestDurationSecondsMaxOne = 86400;
 
 export const createTimerRequestDurationSecondsRegExpTwo = new RegExp("^-?(?:0|[1-9]\\d\*)$");
 
-export const createTimerRequestDurationSecondsMinTwo = 60;
+export const createTimerRequestDurationSecondsMinTwo = 15;
 export const createTimerRequestDurationSecondsMaxTwo = 86400;
 
 export const createTimerRequestAiInstructionsMax = 1000;

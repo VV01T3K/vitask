@@ -130,7 +130,7 @@ export function TextField({
         type="text"
         value={field.state.value}
       />
-      {meta.isTouched ? <ErrorMessages errors={meta.errors} /> : null}
+      {meta.isTouched && !meta.isPristine ? <ErrorMessages errors={meta.errors} /> : null}
     </div>
   );
 }
@@ -181,39 +181,7 @@ export function TextArea({
         rows={rows}
         value={field.state.value}
       />
-      {meta.isTouched ? <ErrorMessages errors={meta.errors} /> : null}
-    </div>
-  );
-}
-
-export function DateField({ className, disabled, id: idProp, label, required }: TextFieldProps) {
-  const field = useFieldContext<string | null | undefined>();
-  const id = useFieldId(idProp, field.name);
-  const isSubmitting = useStore(field.form.store, (state) => state.isSubmitting);
-  const meta = useStore(field.store, (state) => state.meta);
-
-  return (
-    <div className={cx(fieldShellClass, className)}>
-      <label className={labelClass} htmlFor={id}>
-        {label}
-        {required ? (
-          <span aria-hidden="true" className="text-red-500">
-            {" "}
-            *
-          </span>
-        ) : null}
-      </label>
-      <input
-        className={controlClass}
-        disabled={disabled || isSubmitting}
-        id={id}
-        name={field.name}
-        onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value || undefined)}
-        type="date"
-        value={field.state.value ?? ""}
-      />
-      {meta.isTouched ? <ErrorMessages errors={meta.errors} /> : null}
+      {meta.isTouched && !meta.isPristine ? <ErrorMessages errors={meta.errors} /> : null}
     </div>
   );
 }
@@ -265,7 +233,7 @@ export function Select({
           </option>
         ))}
       </select>
-      {meta.isTouched ? <ErrorMessages errors={meta.errors} /> : null}
+      {meta.isTouched && !meta.isPristine ? <ErrorMessages errors={meta.errors} /> : null}
     </div>
   );
 }

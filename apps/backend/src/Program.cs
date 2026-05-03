@@ -38,15 +38,12 @@ var app = builder.Build();
 
 app.EnsureDatabaseCreated();
 
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.MapScalarApiReference(options =>
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference(options =>
-    {
-        options.Title = "Vitask API";
-        options.WithDefaultHttpClient(ScalarTarget.Node, ScalarClient.Fetch);
-    });
-}
+    options.Title = "Vitask API";
+    options.WithDefaultHttpClient(ScalarTarget.Node, ScalarClient.Fetch);
+});
 
 app.UseHttpsRedirection();
 app.UseCors(FrontendCorsPolicy);

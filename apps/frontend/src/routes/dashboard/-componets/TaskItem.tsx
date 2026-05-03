@@ -2,7 +2,7 @@ import type { model } from "@vitask/backend-api";
 import { RotateCcw, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 
-import { relTime } from "./vitask.helpers";
+import { relTime } from "#/lib/timerUtils";
 
 type TaskResponse = model.TaskResponse;
 
@@ -72,7 +72,10 @@ export function TaskItem({
           />
         </button>
 
-        <span className="text-vitask-text-secondary flex-1 truncate text-[13px] line-through">
+        <span
+          className="text-vitask-text-secondary flex-1 cursor-pointer truncate text-[13px] line-through"
+          onClick={() => onUncomplete(task.id)}
+        >
           {task.title}
         </span>
 
@@ -84,19 +87,21 @@ export function TaskItem({
 
         <div className="flex items-center gap-0.5">
           {hype ? (
-            <span
-              aria-label="hype quote"
-              className="text-vitask-text-secondary hover:text-vitask-teal hover:bg-vitask-teal/10 hover:border-vitask-teal/30 relative inline-flex h-7 w-7 cursor-help items-center justify-center rounded border border-transparent opacity-0 transition group-hover:opacity-100"
-              onMouseEnter={() => setShowHype(true)}
-              onMouseLeave={() => setShowHype(false)}
-            >
-              <Sparkles aria-hidden="true" size={12} strokeWidth={2.25} />
+            <div className="relative">
+              <span
+                aria-label="hype quote"
+                className="text-vitask-text-secondary hover:text-vitask-teal hover:bg-vitask-teal/10 hover:border-vitask-teal/30 inline-flex h-7 w-7 cursor-help items-center justify-center rounded border border-transparent opacity-55 transition hover:opacity-100"
+                onMouseEnter={() => setShowHype(true)}
+                onMouseLeave={() => setShowHype(false)}
+              >
+                <Sparkles aria-hidden="true" size={12} strokeWidth={2.25} />
+              </span>
               {showHype ? (
                 <span className="bg-vitask-elevated border-vitask-border-bright text-vitask-teal pointer-events-none absolute right-0 bottom-[calc(100%+6px)] z-10 w-60 rounded border p-2.5 text-xs leading-relaxed font-normal whitespace-normal italic shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
                   "{hype}"
                 </span>
               ) : null}
-            </span>
+            </div>
           ) : null}
 
           <button
@@ -152,9 +157,10 @@ export function TaskItem({
       <span
         className={
           striking
-            ? "text-vitask-text-primary vitask-strike relative flex-1 truncate text-sm"
-            : "text-vitask-text-primary flex-1 truncate text-sm"
+            ? "text-vitask-text-primary vitask-strike relative flex-1 cursor-pointer truncate text-sm"
+            : "text-vitask-text-primary flex-1 cursor-pointer truncate text-sm"
         }
+        onClick={handleComplete}
       >
         {task.title}
       </span>
