@@ -11,13 +11,10 @@ import { getFieldErrorMessages } from "#/lib/formErrors";
 import {
   defaultTimerAppearance,
   normalizeTimerAppearance,
-  type TimerAppearance,
   type TimerIconKey,
 } from "#/lib/timerAppearance";
 
 import { TimerAppearancePicker } from "./TimerAppearancePicker";
-
-type TimerResponse = model.TimerResponse;
 
 function formatDurationLimit(totalSeconds: number): string {
   if (totalSeconds < 60) return `${totalSeconds} second${totalSeconds === 1 ? "" : "s"}`;
@@ -25,48 +22,57 @@ function formatDurationLimit(totalSeconds: number): string {
   return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 }
 
-const timerFormSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(
-      model.createTimerRequestTitleMin,
-      `Title must be at least ${model.createTimerRequestTitleMin} characters.`,
-    )
-    .max(
-      model.createTimerRequestTitleMax,
-      `Title must be at most ${model.createTimerRequestTitleMax} characters.`,
-    ),
-  description: z
-    .string()
-    .trim()
-    .max(
-      model.createTimerRequestDescriptionMax,
-      `Description must be at most ${model.createTimerRequestDescriptionMax} characters.`,
-    ),
-  hours: z.string().trim().default("0"),
-  minutes: z.string().trim().default("30"),
-  seconds: z.string().trim().default("0"),
-  aiInstructions: z
-    .string()
-    .trim()
-    .min(1, "AI instructions are required.")
-    .max(
-      model.createTimerRequestAiInstructionsMax,
-      `AI instructions must be at most ${model.createTimerRequestAiInstructionsMax} characters.`,
-    ),
-  icon: z.string().trim().default(defaultTimerAppearance.icon),
-  color: z.string().trim().default(defaultTimerAppearance.color),
-});
+const timerFormSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(
+        model.createTimerRequestTitleMin,
+        `Title must be at least ${model.createTimerRequestTitleMin} characters.`,
+      )
+      .max(
+        model.createTimerRequestTitleMax,
+        `Title must be at most ${model.createTimerRequestTitleMax} characters.`,
+      ),
+    description: z
+      .string()
+      .trim()
+      .max(
+        model.createTimerRequestDescriptionMax,
+        `Description must be at most ${model.createTimerRequestDescriptionMax} characters.`,
+      ),
+    hours: z.string().trim().default("0"),
+    minutes: z.string().trim().default("30"),
+    seconds: z.string().trim().default("0"),
+    aiInstructions: z
+      .string()
+      .trim()
+      .min(1, "AI instructions are required.")
+      .max(
+        model.createTimerRequestAiInstructionsMax,
+        `AI instructions must be at most ${model.createTimerRequestAiInstructionsMax} characters.`,
+      ),
+    icon: z.string().trim().default(defaultTimerAppearance.icon),
+    color: z.string().trim().default(defaultTimerAppearance.color),
+  })
+  .transform(
+    (values): z.input<typeof model.CreateTimerRequest> => ({
+      title: values.title,
+      description: values.description || `Check in for ${values.title}`,
+      durationSeconds:
+        (Number(values.hours?.trim()) || 0) * 3600 +
+        (Number(values.minutes?.trim()) || 0) * 60 +
+        (Number(values.seconds?.trim()) || 0),
+      aiInstructions: values.aiInstructions,
+      icon: values.icon,
+      color: values.color,
+    }),
+  )
+  .pipe(model.CreateTimerRequest);
 
 type TimerFormValues = z.input<typeof timerFormSchema>;
-export type TimerSubmitValues = {
-  title: string;
-  description: string;
-  durationSeconds: number;
-  aiInstructions: string;
-  appearance: TimerAppearance;
-};
+export type TimerSubmitValues = z.output<typeof timerFormSchema>;
 
 const emptyTimerFormValues: TimerFormValues = {
   title: "",
@@ -79,7 +85,7 @@ const emptyTimerFormValues: TimerFormValues = {
   color: defaultTimerAppearance.color,
 };
 
-function timerToFormValues(timer: TimerResponse): TimerFormValues {
+function timerToFormValues(timer: model.TimerResponse): TimerFormValues {
   const totalSeconds = Number(timer.durationSeconds);
   return {
     title: timer.title,
@@ -100,7 +106,7 @@ type CreateTimerModalProps = {
   activeTaskTitles: string[];
   isSubmitting: boolean;
   errorMessage?: string | null;
-  timer?: TimerResponse;
+  timer?: model.TimerResponse;
 };
 
 export function CreateTimerModal({
@@ -125,10 +131,9 @@ export function CreateTimerModal({
       onSubmit: timerFormSchema,
     },
     onSubmit: async ({ value, formApi }) => {
-      const parsed = toTimerSubmitValues(value);
-      if (!parsed) return;
-
-      const success = await onSubmit(parsed);
+      const parsed = timerFormSchema.safeParse(value);
+      if (!parsed.success) return;
+      const success = await onSubmit(parsed.data);
 
       if (success) {
         if (!isEditing) formApi.reset();
@@ -449,40 +454,6 @@ export function CreateTimerModal({
       </div>
     </div>
   );
-}
-
-function toTimerSubmitValues(values: TimerFormValues): TimerSubmitValues | null {
-  const title = values.title.trim();
-  const description = values.description.trim();
-  const hours = Number(values.hours?.trim()) || 0;
-  const minutes = Number(values.minutes?.trim()) || 0;
-  const seconds = Number(values.seconds?.trim()) || 0;
-  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-
-  if (totalSeconds < model.createTimerRequestDurationSecondsMinOne) {
-    console.warn(
-      `Duration must be at least ${formatDurationLimit(model.createTimerRequestDurationSecondsMinOne)}.`,
-    );
-    return null;
-  }
-
-  if (totalSeconds > model.createTimerRequestDurationSecondsMaxOne) {
-    console.warn(
-      `Duration must be at most ${formatDurationLimit(model.createTimerRequestDurationSecondsMaxOne)}.`,
-    );
-    return null;
-  }
-
-  return {
-    title,
-    description: description || `Check in for ${title}`,
-    durationSeconds: totalSeconds,
-    aiInstructions: values.aiInstructions.trim(),
-    appearance: normalizeTimerAppearance({
-      icon: values.icon as TimerIconKey,
-      color: values.color,
-    }),
-  };
 }
 
 function Field({

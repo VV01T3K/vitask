@@ -166,7 +166,8 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
       description,
       durationSeconds: nextDurationSeconds,
       aiInstructions,
-      appearance,
+      icon,
+      color,
     }: TimerSubmitValues) => {
       try {
         const response = await createTimerMutation.mutateAsync({
@@ -175,8 +176,8 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
             description,
             durationSeconds: nextDurationSeconds,
             aiInstructions,
-            icon: appearance.icon,
-            color: appearance.color,
+            icon,
+            color,
           },
         });
 
@@ -201,10 +202,12 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
       description,
       durationSeconds: nextDurationSeconds,
       aiInstructions,
-      appearance,
+      icon,
+      color,
     }: TimerSubmitValues) => {
       if (!editingTimer) return false;
-      const durationChanged = durationSeconds(editingTimer) !== nextDurationSeconds;
+      const resolvedDuration = Number(nextDurationSeconds);
+      const durationChanged = durationSeconds(editingTimer) !== resolvedDuration;
       try {
         await updateTimerMutation.mutateAsync({
           id: editingTimer.id,
@@ -213,14 +216,14 @@ export function TimersPanel({ initialNudges, onTimerFired, onTimerSnoozed }: Tim
             description,
             durationSeconds: nextDurationSeconds,
             aiInstructions,
-            icon: appearance.icon,
-            color: appearance.color,
+            icon,
+            color,
           },
         });
         if (durationChanged) {
           setRuntimes((previous) => ({
             ...previous,
-            [editingTimer.id]: createRuntime(nextDurationSeconds),
+            [editingTimer.id]: createRuntime(resolvedDuration),
           }));
         }
         await invalidateTimers();

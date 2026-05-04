@@ -8,7 +8,7 @@
     "check": "vpr -r check",
     "fix": "vpr -r fix",
     "gen": "vpr -r gen",
-    "env": ". ./.env.example && sed \"s|^GROQ_API_KEY=$|GROQ_API_KEY=$(echo $OBFUSCATED | base64 -d | base64 -d)|\" .env.example > .env"
+    "setup": ". ./.env.example && sed \"s|^GROQ_API_KEY=$|GROQ_API_KEY=$(echo $OBFUSCATED | base64 -d | base64 -d)|\" .env.example > .env"
   },
   "devDependencies": {
     "vite-plus": "catalog:"
