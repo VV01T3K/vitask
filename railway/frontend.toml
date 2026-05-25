@@ -1,0 +1,20 @@
+[build]
+builder = "RAILPACK"
+buildCommand = "pnpm --filter frontend build"
+watchPatterns = [
+  "apps/frontend/**",
+  "shared/backend-api/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "railway/frontend.toml",
+  "tsconfig.json",
+  "vite.config.ts",
+]
+
+[deploy]
+startCommand = "HOST=0.0.0.0 node apps/frontend/.output/server/index.mjs"
+healthcheckPath = "/"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

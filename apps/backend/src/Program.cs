@@ -59,6 +59,7 @@ if (!app.Environment.IsProduction())
 }
 app.UseCors(FrontendCorsPolicy);
 
+app.MapGet("/healthz", () => Results.Text("ok")).ExcludeFromDescription();
 app.MapTaskEndpoints();
 app.MapTimerEndpoints();
 

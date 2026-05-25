@@ -32,6 +32,42 @@ docker compose up
 
 Frontend at `http://localhost:3000` · Backend at `http://localhost:5107`
 
+## Railway Deployment
+
+Deploy this repo as two Railway services from the same GitHub repository:
+
+1. Create a `backend` service.
+   - Root Directory: `/apps/backend`
+   - Railway Config File: `/railway/backend.toml`
+   - Generate a public domain.
+   - Variables:
+
+     ```bash
+     PORT=5107
+     ASPNETCORE_ENVIRONMENT=Production
+     Scalar__Enabled=false
+     Cors__AllowedOrigins__0=https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}
+     ```
+
+2. Create a `frontend` service.
+   - Root Directory: `/`
+   - Railway Config File: `/railway/frontend.toml`
+   - Generate a public domain.
+   - Variables:
+
+     ```bash
+     PORT=3000
+     NODE_ENV=production
+     GROQ_API_KEY=<your Groq API key>
+     BACKEND_URL=http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:${{backend.PORT}}
+     PUBLIC_BACKEND_URL=https://${{backend.RAILWAY_PUBLIC_DOMAIN}}
+     SCALAR_ENABLED=false
+     ```
+
+If you enable Scalar for the API explorer, set `Scalar__Enabled=true` on the backend and
+`SCALAR_ENABLED=true` on the frontend. For a custom frontend domain, add another backend
+CORS variable such as `Cors__AllowedOrigins__1=https://app.example.com`.
+
 ## Local Development Setup
 
 ```bash
