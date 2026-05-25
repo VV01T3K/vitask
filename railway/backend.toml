@@ -1,11 +1,13 @@
 [build]
 builder = "RAILPACK"
+buildCommand = "dotnet publish -c Release -o out -p:OpenApiGenerateDocuments=false"
 watchPatterns = [
   "apps/backend/**",
   "railway/backend.toml",
 ]
 
 [deploy]
+startCommand = "ASPNETCORE_URLS=http://0.0.0.0:${PORT:-3000} ./out/backend"
 healthcheckPath = "/healthz"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
