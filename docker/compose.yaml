@@ -23,7 +23,7 @@ services:
       BACKEND_URL: "http://backend:5107"
       PUBLIC_BACKEND_URL: "${PUBLIC_BACKEND_URL:-http://localhost:5107}"
       SCALAR_ENABLED: "${SCALAR_ENABLED:-false}"
-      GROQ_API_KEY: "${GROQ_API_KEY:?GROQ_API_KEY required run -> vpr --no-cache env}"
+      GROQ_API_KEY: "${GROQ_API_KEY:?GROQ_API_KEY required}"
     depends_on:
       backend:
         condition: service_started
