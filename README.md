@@ -26,10 +26,7 @@ https://github.com/user-attachments/assets/07c69a3b-89e3-423f-822f-c182f9feb5b2
 ## Quick Setup (Docker)
 
 ```bash
-# 1. Generate a .env file with a Groq API key (will be available only for some time)
-vpr --no-cache setup      # or: pnpm/npm/bun run setup
-
-# 2. Start both services
+# Start both services
 docker compose up
 ```
 
