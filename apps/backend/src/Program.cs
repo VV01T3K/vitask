@@ -11,6 +11,20 @@ var scalarEnabled = builder.Configuration.GetValue(
     "Scalar:Enabled",
     builder.Environment.IsDevelopment()
 );
+var scalarBaseServerUrl =
+    builder.Configuration.GetValue<string>("Scalar:BaseServerUrl")
+    ?? builder.Configuration.GetValue<string>("PUBLIC_BACKEND_URL");
+var railwayPublicDomain = builder.Configuration.GetValue<string>("RAILWAY_PUBLIC_DOMAIN");
+
+if (
+    string.IsNullOrWhiteSpace(scalarBaseServerUrl)
+    && !string.IsNullOrWhiteSpace(railwayPublicDomain)
+)
+{
+    scalarBaseServerUrl = railwayPublicDomain.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+        ? railwayPublicDomain
+        : $"https://{railwayPublicDomain}";
+}
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 builder.Services.AddInMemorySqliteDatabase();
@@ -50,6 +64,12 @@ if (scalarEnabled)
     {
         options.Title = "Vitask API";
         options.WithDefaultHttpClient(ScalarTarget.Node, ScalarClient.Fetch);
+
+        if (!string.IsNullOrWhiteSpace(scalarBaseServerUrl))
+        {
+            options.WithBaseServerUrl(scalarBaseServerUrl);
+            options.AddServer(scalarBaseServerUrl, "Vitask API");
+        }
     });
 }
 
