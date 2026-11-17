@@ -1,0 +1,31 @@
+{
+  "name": "@vitask/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "CELLD_ESBUILD=./node_modules/.bin/esbuild celld dev . --port 8790",
+    "dev:wrangler": "wrangler dev --port 8791",
+    "deploy:celld": "node scripts/deploy-celld.mjs",
+    "test": "vp test run",
+    "test:integration": "node scripts/integration.mjs",
+    "check": "vp check",
+    "fix": "vp check --fix"
+  },
+  "dependencies": {
+    "@earendil-works/chord": "1.5.2",
+    "@earendil-works/pi-ai": "1.5.2",
+    "@earendil-works/pi-durable": "1.5.2",
+    "@earendil-works/pi-schema": "1.5.2",
+    "@vitask/coach": "workspace:*",
+    "@vitask/protocol": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261116.1",
+    "@types/node": "catalog:",
+    "esbuild": "0.28.2",
+    "typescript": "catalog:",
+    "vite-plus": "0.1.20",
+    "wrangler": "4.163.0"
+  }
+}

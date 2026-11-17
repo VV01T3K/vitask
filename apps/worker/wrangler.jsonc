@@ -1,0 +1,31 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // celld requires: wrangler.jsonc, this exact script name (idFromName keys derive from it), only new_sqlite_classes.
+  "name": "vitask",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [{ "name": "WORKSPACE", "class_name": "WorkspaceObject" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["WorkspaceObject"] }],
+  "assets": {
+    // The SPA build lands here in a later stage; the placeholder keeps the asset path working until then.
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  "vars": {
+    "COACH_PROVIDER": "groq",
+    "COACH_MODEL": "openai/gpt-oss-120b",
+    "DAILY_TOKEN_BUDGET": "200000",
+    "CHAT_RATE_LIMIT_PER_MINUTE": "10",
+    "MAX_SESSION_MINUTES": "240",
+    "MIN_TIMER_INTERVAL_SECONDS": "60",
+    "APPROVAL_TTL_SECONDS": "600",
+    "ALLOWED_ORIGINS": "",
+    // Development only. scripts/deploy-celld.mjs refuses to deploy without a real COOKIE_SECRET in the environment.
+    "COOKIE_SECRET": "dev-only-insecure-cookie-secret",
+  },
+}
