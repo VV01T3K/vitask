@@ -22,15 +22,6 @@
   "files.exclude": {
     ".mise-setup-done": true
   },
-  "files.watcherExclude": {
-    "**/*.gen.ts": true
-  },
-  "search.exclude": {
-    "**/*.gen.ts": true
-  },
-  "files.readonlyInclude": {
-    "**/*.gen.ts": true
-  },
   "[css]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
@@ -52,13 +43,6 @@
   "[toml]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "[xml]": {
-    "editor.defaultFormatter": "csharpier.csharpier-vscode"
-  },
-  "[csharp]": {
-    "editor.defaultFormatter": "csharpier.csharpier-vscode"
-  },
-  "csharpier.dev.useCustomPath": false,
   "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
   "css.lint.unknownAtRules": "ignore"
 }

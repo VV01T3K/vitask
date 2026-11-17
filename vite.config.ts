@@ -2,7 +2,7 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   fmt: {
-    ignorePatterns: ["**/*.gen.ts"],
+    ignorePatterns: ["apps/worker/public/**", "**/.celld/**", "**/.wrangler/**"],
     sortTailwindcss: true,
     sortImports: true,
     sortPackageJson: true,

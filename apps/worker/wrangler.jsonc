@@ -10,7 +10,8 @@
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["WorkspaceObject"] }],
   "assets": {
-    // The SPA build lands here in a later stage; the placeholder keeps the asset path working until then.
+    // apps/web builds into this git-ignored directory (`vpr -r build`): celld accepts only an asset directory inside
+    // the project. Unknown paths fall back to its index.html.
     "directory": "./public",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",

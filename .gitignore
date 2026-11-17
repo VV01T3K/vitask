@@ -9,12 +9,8 @@ lerna-debug.log*
 
 node_modules
 dist
-dist-ssr
 *.local
 
-# .NET
-bin/
-obj/
 
 # Editor directories and files
 .vscode/*
@@ -22,10 +18,6 @@ obj/
 !.vscode/settings.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
 
 # AI agent worktrees
@@ -33,9 +25,12 @@ obj/
 
 
 .env*
-!.env.example
 # celld / wrangler local state and secrets
 .dev.vars
 .celld/
 .wrangler/
 .deploy.wrangler.jsonc
+
+# apps/web builds into the Worker's asset directory
+apps/worker/public/
+apps/web/test-results/

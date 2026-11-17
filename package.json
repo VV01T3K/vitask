@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm -r --no-sort dev",
+    "dev": "pnpm --parallel --filter @vitask/worker --filter @vitask/web dev",
+    "build": "vpr -r build",
     "check": "vpr -r check",
     "fix": "vpr -r fix",
-    "gen": "vpr -r gen"
+    "test": "vpr -r test"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

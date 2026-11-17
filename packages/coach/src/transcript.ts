@@ -17,7 +17,15 @@ function contentText(content: Message["content"] | undefined): string {
 /** A transcript entry as the UI shows it; undefined for bookkeeping entries (system prompt, thinking only). */
 export function toCoachEntry(entry: EntryRecord): CoachEntry | undefined {
   const message = entry.model?.[0];
-  const base = { id: Number(entry.id), toolCalls: [], toolName: null, isError: false };
+  const base = {
+    id: Number(entry.id),
+    at: message && "timestamp" in message ? message.timestamp : null,
+    toolCalls: [],
+    toolName: null,
+    toolCallId: null,
+    approvalId: null,
+    isError: false,
+  };
   switch (entry.kind) {
     case "pi.user":
       return { ...base, role: "user", text: contentText(message?.content) };
@@ -43,6 +51,8 @@ export function toCoachEntry(entry: EntryRecord): CoachEntry | undefined {
         role: "tool",
         text: contentText(message.content),
         toolName: message.toolName,
+        toolCallId: message.toolCallId,
+        approvalId: approvalIdOf(message.details),
         isError: message.isError,
       };
     case "pi.reset":
@@ -60,6 +70,16 @@ export function toCoachEntry(entry: EntryRecord): CoachEntry | undefined {
   }
 }
 
+function approvalIdOf(details: unknown): string | null {
+  return details !== null &&
+    typeof details === "object" &&
+    !Array.isArray(details) &&
+    "approvalId" in details &&
+    typeof details.approvalId === "string"
+    ? details.approvalId
+    : null;
+}
+
 export function toCoachLive(live: LiveState | undefined): CoachLive {
   const partial = live?.generation?.message;
   const partialText =
@@ -71,15 +91,12 @@ export function toCoachLive(live: LiveState | undefined): CoachLive {
     busy: live?.run !== undefined,
     partialText,
     tools: (live?.tools ?? []).map((slot) => {
-      const details = slot.details;
-      const approvalId =
-        details !== null &&
-        typeof details === "object" &&
-        !Array.isArray(details) &&
-        typeof details.approvalId === "string"
-          ? details.approvalId
-          : null;
-      return { callId: slot.callId, name: slot.name, status: slot.status, approvalId };
+      return {
+        callId: slot.callId,
+        name: slot.name,
+        status: slot.status,
+        approvalId: approvalIdOf(slot.details),
+      };
     }),
     failure:
       failure === undefined

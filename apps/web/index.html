@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A task list with care timers and an AI coach that asks before it changes anything."
+    />
+    <link rel="icon" href="/favicon.ico" />
+    <title>vitask</title>
+    <script>
+      // Set the theme before the first paint so a reload never flashes the wrong one.
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("vitask-theme");
+        } catch (e) {}
+        var dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

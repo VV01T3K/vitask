@@ -6,6 +6,7 @@ import {
   appendFileSync,
   cpSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -40,9 +41,11 @@ const config = JSON.parse(
 );
 delete config.$schema;
 // celld wants `main` inside the project: link the sources in (esbuild resolves packages from their real path) and
-// copy the small asset directory, since celld refuses symlinked assets.
+// copy the asset directory (the web build, if there is one), since celld refuses symlinked assets.
 symlinkSync(join(workerDir, "src"), join(project, "src"));
-cpSync(join(workerDir, "public"), join(project, "public"), { recursive: true });
+if (existsSync(join(workerDir, "public")))
+  cpSync(join(workerDir, "public"), join(project, "public"), { recursive: true });
+else mkdirSync(join(project, "public"));
 Object.assign(config.vars, { MIN_TIMER_INTERVAL_SECONDS: "2", APPROVAL_TTL_SECONDS: "180" });
 writeFileSync(join(project, "wrangler.jsonc"), JSON.stringify(config, null, 2));
 if (existsSync(join(workerDir, ".dev.vars"))) {

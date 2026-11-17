@@ -1,0 +1,2 @@
+# Copy to .dev.vars (git-ignored) for `vpr dev` and the tests.
+GROQ_API_KEY=

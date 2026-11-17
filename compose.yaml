@@ -1,3 +1,0 @@
-# Convienient shortcut to run docker compose command in the project root
-include:
-  - docker/compose.yaml

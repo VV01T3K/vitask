@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "CELLD_ESBUILD=./node_modules/.bin/esbuild celld dev . --port 8790",
+    "dev": "mkdir -p public && CELLD_ESBUILD=./node_modules/.bin/esbuild celld dev . --port 8790",
     "dev:wrangler": "wrangler dev --port 8791",
     "deploy:celld": "node scripts/deploy-celld.mjs",
     "test": "vp test run",

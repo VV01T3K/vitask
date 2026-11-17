@@ -212,9 +212,15 @@ export const CoachEntry = z.object({
   /** pi-durable entry id; increases monotonically. */
   id: z.number().int(),
   role: z.enum(["user", "assistant", "tool", "notice"]),
+  /** When the message was created, if the entry carries a message. */
+  at: Timestamp.nullable(),
   text: z.string(),
   toolCalls: z.array(z.object({ id: z.string(), name: z.string(), args: z.unknown() })),
   toolName: z.string().nullable(),
+  /** For `tool` entries: the call this result answers. */
+  toolCallId: z.string().nullable(),
+  /** For `tool` entries of a gated (mutating) tool: the approval the call went through. */
+  approvalId: z.string().nullable(),
   isError: z.boolean(),
 });
 export type CoachEntry = z.infer<typeof CoachEntry>;
