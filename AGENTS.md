@@ -8,6 +8,10 @@ Layout: `apps/web` (Vite + React SPA), `apps/worker` (Cloudflare-style Worker wi
 on celld), `packages/protocol` (zod contract: domain, HTTP API, WebSocket messages), `packages/coach` (the AI coach
 on pi-durable). The web app builds into `apps/worker/public/`, which the Worker serves as static assets.
 
+Docs: `README.md` (overview), `docs/architecture.md` (request flow, object lifecycle, data model, WebSocket
+protocol, approval flow, celld workarounds, decisions), `docs/deploy.md` (celld fleet, single VPS, Cloudflare),
+`docs/evals.md` (eval harness, judge, adding a case, latest numbers). Keep them in step with the code.
+
 Setup: copy `apps/worker/.dev.vars.example` to `apps/worker/.dev.vars` and set `GROQ_API_KEY` (keep
 `D1_DEV_MIGRATIONS=apply`). celld must be on PATH or in `~/.local/bin`.
 
@@ -18,13 +22,17 @@ visitor's anonymous workspace (user-create hook), and once owned, only that acco
 from an anonymous browser opens the account's workspace and leaves the anonymous one alone (no merge). Open the app at
 http://localhost:5173 in development: passkeys are bound to `BETTER_AUTH_URL`'s hostname, so 127.0.0.1 does not work.
 
-- D1 schema: `apps/worker/migrations/NNNN_*.sql`. After changing the auth options, `vpr --filter @vitask/worker
-  db:schema` prints the full Better Auth schema to diff against; `test/migrations.test.ts` fails while the files and
-  the options disagree. Apply: `celld dev` applies them itself (`D1_DEV_MIGRATIONS=apply`, a workaround in
-  `src/dev-migrations.ts`: `celld d1` cannot reach a dev database); `db:migrate:local` for `wrangler dev`;
-  `CELLD_BUCKET=s3://... vpr --filter @vitask/worker db:migrate:celld` for a fleet; `db:migrate:cloudflare` for D1.
-- Deploy to celld: `GROQ_API_KEY COOKIE_SECRET BETTER_AUTH_SECRET BETTER_AUTH_URL=https://... vpr --filter
-  @vitask/worker deploy:celld -- --bucket s3://...`, then `db:migrate:celld`. The secrets must be random, 32+ chars.
+- D1 schema: `apps/worker/migrations/NNNN_*.sql`. After changing the auth options,
+  `vpr --filter @vitask/worker db:schema` prints the full Better Auth schema to diff against;
+  `test/migrations.test.ts` fails while the files and the options disagree. Apply: `celld dev` applies them itself
+  (`D1_DEV_MIGRATIONS=apply`, a workaround in `src/dev-migrations.ts`: `celld d1` cannot reach a dev database); `db:migrate:local` for `wrangler dev`;
+  `CELLD_BUCKET=s3://... vpr --filter @vitask/worker db:migrate:celld` for a fleet;
+  `db:migrate:cloudflare` for D1.
+- Deploy to celld (details in `docs/deploy.md`): with `GROQ_API_KEY`, `COOKIE_SECRET`, `BETTER_AUTH_SECRET` and
+  `BETTER_AUTH_URL=https://...` in the environment, run
+  `vpr --filter @vitask/worker deploy:celld --bucket s3://...`, then `db:migrate:celld`. The secrets
+  must be random, 32+ chars. Do not put `--` before the celld flags (`celld deploy` rejects it).
+  Nodes behind a TLS proxy need `CELLD_TRUST_FORWARDED_HEADERS=1`, or the same-origin check refuses https requests.
 
 - Check everything (format, lint, types; formatter and linter settings live in the root `vite.config.ts`):
 

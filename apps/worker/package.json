@@ -5,13 +5,7 @@
   "scripts": {
     "dev": "mkdir -p public && CELLD_ESBUILD=./node_modules/.bin/esbuild celld dev . --port 8790",
     "dev:wrangler": "wrangler dev --port 8791",
-    "deploy:celld": "node scripts/deploy-celld.mjs",
-    "db:migrate:local": "wrangler d1 migrations apply vitask-auth --local",
-    "db:migrate:celld": "celld d1 migrations apply vitask-auth .",
-    "db:migrate:cloudflare": "wrangler d1 migrations apply vitask-auth --remote",
-    "db:schema": "node scripts/auth-schema.mjs",
     "test": "vp test run",
-    "test:integration": "node scripts/integration.mjs",
     "check": "vp check",
     "fix": "vp check --fix"
   },
