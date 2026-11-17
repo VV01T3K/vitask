@@ -49,6 +49,25 @@ vpr --filter @vitask/worker test:integration
 vpr --filter @vitask/web test:e2e
 ```
 
+- Coach evals (`packages/evals`): the real coach on pi-durable `MemoryStorage` against a golden dataset, with
+  deterministic checks and an LLM judge for text quality. Reports go to `packages/evals/reports/` (git-ignored except
+  `baseline.*`). Real runs read `GROQ_API_KEY` from the env or `apps/worker/.dev.vars`; the free Groq tier allows
+  8k tokens per minute and a daily token cap per model, so a full run takes 15 to 20 minutes, costs about 4 cents,
+  and one model fits about one run per day (quota refusals are reported as errors, not failures). `eval:faux` needs
+  no key and runs in CI.
+
+```bash
+vpr eval:faux                                   # scripted faux model, no key
+vpr eval                                        # production model (openai/gpt-oss-120b)
+vpr eval:matrix                                 # gpt-oss-120b, gpt-oss-20b, qwen3.8-27b side by side
+vpr eval --cases add-simple,inject-title        # also --category, --limit, --model, --judge, --budget,
+                                                # --concurrency, --min-pass-rate, --name, --out (see --help)
+```
+
+- CI (`.github/workflows/ci.yml`): check, unit tests, build and `eval:faux` on every push and PR; with the
+  `GROQ_API_KEY` secret also the Worker integration test on celld 0.6.3 and the real eval suite (fails under 80%
+  pass rate, report uploaded as the `eval-report` artifact).
+
 <!-- intent-skills:start -->
 
 ## Skill Loading

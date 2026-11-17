@@ -2,7 +2,13 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   fmt: {
-    ignorePatterns: ["apps/worker/public/**", "**/.celld/**", "**/.wrangler/**"],
+    ignorePatterns: [
+      "apps/worker/public/**",
+      "**/.celld/**",
+      "**/.wrangler/**",
+      // Generated eval reports.
+      "packages/evals/reports/**",
+    ],
     sortTailwindcss: true,
     sortImports: true,
     sortPackageJson: true,

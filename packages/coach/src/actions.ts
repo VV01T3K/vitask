@@ -97,7 +97,8 @@ export const ACTIONS = {
   }),
 
   complete_task: action({
-    description: "Propose marking a task done.",
+    description:
+      "Propose marking a task done, also when the user says they finished or did what the task describes.",
     parameters: obj({ taskId }),
     problem: async (args, deps) => {
       const task = await deps.store.getTask(args.taskId);
@@ -154,7 +155,7 @@ export const ACTIONS = {
 
   plan_focus_blocks: action({
     description:
-      "Propose an ordered plan of focus blocks over open tasks with minute estimates. Approved, it becomes the current plan, sets the estimates and orders the tasks.",
+      "Propose an ordered plan of focus blocks over open tasks with minute estimates. Estimate the minutes yourself (respect remembered preferences such as block length). Approved, it becomes the current plan, sets the estimates and orders the tasks.",
     parameters: obj({
       blocks: arr(obj({ taskId, minutes, note: opt(str({ maxLength: 200 })) }), {
         minItems: 1,

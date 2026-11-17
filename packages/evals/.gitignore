@@ -1,0 +1,4 @@
+# Raw eval runs; only the baseline report is committed.
+reports/*
+!reports/baseline.md
+!reports/baseline.json

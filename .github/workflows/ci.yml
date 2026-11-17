@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main, v2]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DO_NOT_TRACK: "1"
+
+jobs:
+  check:
+    name: Check, test, build, faux eval
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.13.1
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          version: 1.0.0
+          node-manager: false
+          run-install: false
+      - name: Install
+        run: vp install --frozen-lockfile
+      - name: Check (format, lint, types)
+        run: vpr check
+      - name: Unit tests
+        run: vpr test
+      - name: Build
+        run: vpr build
+      - name: Eval harness on the faux model
+        run: vpr eval:faux --name faux
+
+  eval:
+    name: Real evals and Worker integration (Groq)
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    # Free-tier Groq limits are per key, so real runs never overlap.
+    concurrency:
+      group: groq-evals
+      cancel-in-progress: false
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+    steps:
+      # Secrets are not available to fork PRs; the job then passes without calling a model.
+      - name: Look for the Groq key
+        id: key
+        run: |
+          if [ -n "$GROQ_API_KEY" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::GROQ_API_KEY is not available; skipping the real evals and the integration test."
+          fi
+      - if: steps.key.outputs.available == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: steps.key.outputs.available == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.13.1
+      - if: steps.key.outputs.available == 'true'
+        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          version: 1.0.0
+          node-manager: false
+          run-install: false
+      - if: steps.key.outputs.available == 'true'
+        name: Install
+        run: vp install --frozen-lockfile
+      - if: steps.key.outputs.available == 'true'
+        name: Install celld
+        run: curl -fsSL https://celld.dev/install.sh | CELLD_VERSION=v0.6.3 sh
+      - if: steps.key.outputs.available == 'true'
+        name: Worker integration test on celld
+        run: vpr --filter @vitask/worker test:integration
+      # Runs even when the integration test failed, so both results are visible.
+      - if: "!cancelled() && steps.key.outputs.available == 'true'"
+        name: Real eval suite (production model)
+        run: vpr eval --name ci --concurrency 2 --budget 0.25 --min-pass-rate 0.8
+      - if: always() && steps.key.outputs.available == 'true'
+        name: Upload the eval report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: eval-report
+          path: |
+            packages/evals/reports/ci.md
+            packages/evals/reports/ci.json
+          if-no-files-found: warn
