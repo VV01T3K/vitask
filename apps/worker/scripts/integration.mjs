@@ -43,10 +43,17 @@ delete config.$schema;
 // celld wants `main` inside the project: link the sources in (esbuild resolves packages from their real path) and
 // copy the asset directory (the web build, if there is one), since celld refuses symlinked assets.
 symlinkSync(join(workerDir, "src"), join(project, "src"));
+symlinkSync(join(workerDir, "migrations"), join(project, "migrations"));
 if (existsSync(join(workerDir, "public")))
   cpSync(join(workerDir, "public"), join(project, "public"), { recursive: true });
 else mkdirSync(join(project, "public"));
-Object.assign(config.vars, { MIN_TIMER_INTERVAL_SECONDS: "2", APPROVAL_TTL_SECONDS: "180" });
+Object.assign(config.vars, {
+  MIN_TIMER_INTERVAL_SECONDS: "2",
+  APPROVAL_TTL_SECONDS: "180",
+  BETTER_AUTH_URL: origin,
+  // celld dev cannot run `celld d1 migrations apply` (src/dev-migrations.ts).
+  D1_DEV_MIGRATIONS: "apply",
+});
 writeFileSync(join(project, "wrangler.jsonc"), JSON.stringify(config, null, 2));
 if (existsSync(join(workerDir, ".dev.vars"))) {
   symlinkSync(join(workerDir, ".dev.vars"), join(project, ".dev.vars")); // never copy the key
@@ -103,7 +110,10 @@ function killCelld() {
 }
 
 class Client {
-  cookie = "";
+  jar = new Map();
+  get cookie() {
+    return [...this.jar].map(([name, value]) => `${name}=${value}`).join("; ");
+  }
   async request(method, path, body, headers = {}) {
     const response = await fetch(`${base}${path}`, {
       method,
@@ -115,8 +125,11 @@ class Client {
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
-    const set = response.headers.get("set-cookie");
-    if (set) this.cookie = set.split(";")[0];
+    for (const set of response.headers.getSetCookie()) {
+      const [pair] = set.split(";");
+      const at = pair.indexOf("=");
+      this.jar.set(pair.slice(0, at), pair.slice(at + 1));
+    }
     const text = await response.text();
     return { status: response.status, body: text ? JSON.parse(text) : null };
   }
@@ -195,6 +208,22 @@ try {
       "alice should see her task",
     );
     assert(!b.body.tasks.some((t) => t.title === "Alice only"), "bob must not see alice's task");
+  });
+
+  await check("auth endpoints answer and refuse foreign origins", async () => {
+    const session = await alice.request("GET", "/api/auth/get-session");
+    assert(session.status === 200 && session.body === null, JSON.stringify(session));
+    const options = await alice.request("GET", "/api/auth/passkey/generate-authenticate-options");
+    assert(options.status === 200 && options.body.challenge, JSON.stringify(options));
+    assert(options.body.rpId === new URL(origin).hostname, `rpId ${options.body.rpId}`);
+    const foreign = await alice.request(
+      "POST",
+      "/api/auth/sign-out",
+      {},
+      { Origin: "https://evil.example" },
+    );
+    assert(foreign.status === 403, `foreign origin: ${JSON.stringify(foreign)}`);
+    return `rpId ${options.body.rpId}`;
   });
 
   await check("foreign origins and bad input are refused", async () => {

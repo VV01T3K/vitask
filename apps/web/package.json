@@ -12,9 +12,11 @@
     "fix": "vp check --fix"
   },
   "dependencies": {
+    "@better-auth/passkey": "catalog:",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
     "@vitask/protocol": "workspace:*",
+    "better-auth": "catalog:",
     "lucide-react": "1.14.0",
     "react": "19.2.5",
     "react-dom": "19.2.5",

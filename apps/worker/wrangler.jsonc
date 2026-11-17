@@ -9,6 +9,18 @@
     "bindings": [{ "name": "WORKSPACE", "class_name": "WorkspaceObject" }],
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["WorkspaceObject"] }],
+  // Accounts, sessions and passkeys (Better Auth). Schema in migrations/, applied with `vpr db:migrate` (see AGENTS.md).
+  // On Cloudflare, replace database_id with the id `wrangler d1 create vitask-auth` prints; celld uses it as the name.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vitask-auth",
+      "database_id": "vitask-auth",
+      "migrations_dir": "migrations",
+    },
+  ],
+  // migrations/*.sql as text modules, for src/dev-migrations.ts.
+  "rules": [{ "type": "Text", "globs": ["**/*.sql"] }],
   "assets": {
     // apps/web builds into this git-ignored directory (`vpr -r build`): celld accepts only an asset directory inside
     // the project. Unknown paths fall back to its index.html.
@@ -26,7 +38,11 @@
     "MIN_TIMER_INTERVAL_SECONDS": "60",
     "APPROVAL_TTL_SECONDS": "600",
     "ALLOWED_ORIGINS": "",
-    // Development only. scripts/deploy-celld.mjs refuses to deploy without a real COOKIE_SECRET in the environment.
+    // The app's public origin: passkeys are bound to its hostname. In development the
+    // web dev server (`vpr dev`) proxies /api here, so the browser's origin is the dev server's.
+    "BETTER_AUTH_URL": "http://localhost:5173",
+    // Development only. scripts/deploy-celld.mjs refuses to deploy without real secrets in the environment.
     "COOKIE_SECRET": "dev-only-insecure-cookie-secret",
+    "BETTER_AUTH_SECRET": "dev-only-insecure-better-auth-secret-0123456789",
   },
 }

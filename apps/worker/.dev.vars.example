@@ -1,2 +1,4 @@
 # Copy to .dev.vars (git-ignored) for `vpr dev` and the tests.
 GROQ_API_KEY=
+# celld dev cannot run `celld d1 migrations apply`, so the Worker applies migrations/ itself (src/dev-migrations.ts).
+D1_DEV_MIGRATIONS=apply

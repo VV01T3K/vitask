@@ -6,18 +6,24 @@
     "dev": "mkdir -p public && CELLD_ESBUILD=./node_modules/.bin/esbuild celld dev . --port 8790",
     "dev:wrangler": "wrangler dev --port 8791",
     "deploy:celld": "node scripts/deploy-celld.mjs",
+    "db:migrate:local": "wrangler d1 migrations apply vitask-auth --local",
+    "db:migrate:celld": "celld d1 migrations apply vitask-auth .",
+    "db:migrate:cloudflare": "wrangler d1 migrations apply vitask-auth --remote",
+    "db:schema": "node scripts/auth-schema.mjs",
     "test": "vp test run",
     "test:integration": "node scripts/integration.mjs",
     "check": "vp check",
     "fix": "vp check --fix"
   },
   "dependencies": {
+    "@better-auth/passkey": "catalog:",
     "@earendil-works/chord": "1.5.2",
     "@earendil-works/pi-ai": "1.5.2",
     "@earendil-works/pi-durable": "1.5.2",
     "@earendil-works/pi-schema": "1.5.2",
     "@vitask/coach": "workspace:*",
     "@vitask/protocol": "workspace:*",
+    "better-auth": "catalog:",
     "zod": "4.6.7"
   },
   "devDependencies": {

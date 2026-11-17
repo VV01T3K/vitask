@@ -26,7 +26,8 @@ const celld =
   process.env.CELLD ??
   (existsSync(join(homedir(), ".local/bin/celld")) ? join(homedir(), ".local/bin/celld") : "celld");
 const port = 20_000 + Math.floor(Math.random() * 20_000);
-const base = `http://127.0.0.1:${port}`;
+// localhost, not 127.0.0.1: WebAuthn needs a domain as its relying party id (and localhost is a secure context).
+const base = `http://localhost:${port}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [];
 
@@ -48,6 +49,9 @@ const config = JSON.parse(
 );
 delete config.$schema;
 symlinkSync(join(workerDir, "src"), join(project, "src"));
+symlinkSync(join(workerDir, "migrations"), join(project, "migrations"));
+// celld dev cannot run `celld d1 migrations apply`, so the Worker applies them (apps/worker/src/dev-migrations.ts).
+Object.assign(config.vars, { BETTER_AUTH_URL: base, D1_DEV_MIGRATIONS: "apply" });
 cpSync(join(workerDir, "public"), join(project, "public"), { recursive: true });
 writeFileSync(join(project, "wrangler.jsonc"), JSON.stringify(config, null, 2));
 if (existsSync(join(workerDir, ".dev.vars"))) {
@@ -97,7 +101,7 @@ let browser;
 try {
   for (let i = 0; ; i++) {
     try {
-      if ((await fetch(`${base}/api/health`)).ok) break;
+      if ((await fetch(`http://127.0.0.1:${port}/api/health`)).ok) break;
     } catch {}
     if (i > 120) throw new Error(`celld did not start:\n${log}`);
     await sleep(250);
@@ -212,6 +216,88 @@ try {
     );
     await mobile.screenshot({ path: join(shots, "phone.png"), fullPage: true });
     await phone.close();
+    if (overflow > 0) throw new Error(`horizontal overflow of ${overflow}px at phone width`);
+  });
+
+  // Accounts: a fresh browser with a virtual passkey authenticator (Chrome DevTools Protocol, WebAuthn domain).
+  const authContext = await browser.newContext({
+    viewport: { width: 1280, height: 860 },
+    deviceScaleFactor: 2,
+    colorScheme: "dark",
+  });
+  const authPage = await authContext.newPage();
+  authPage.on("console", (m) => m.type() === "error" && consoleErrors.push(m.text()));
+  authPage.on("pageerror", (error) => consoleErrors.push(String(error)));
+  const cdp = await authContext.newCDPSession(authPage);
+  await cdp.send("WebAuthn.enable");
+  const { authenticatorId } = await cdp.send("WebAuthn.addVirtualAuthenticator", {
+    options: {
+      protocol: "ctap2",
+      transport: "internal",
+      hasResidentKey: true,
+      hasUserVerification: true,
+      isUserVerified: true,
+      automaticPresenceSimulation: true,
+    },
+  });
+  const kept = "Keep this across devices";
+  const taskButton = () => authPage.getByRole("button", { name: `Mark ${kept} complete` });
+  const openDashboard = async () => {
+    await authPage.goto(`${base}/dashboard`);
+    await authPage.getByText("live", { exact: true }).waitFor({ timeout: 15_000 });
+  };
+
+  await step(
+    "an anonymous visitor saves their workspace with a passkey and keeps the task",
+    async () => {
+      await openDashboard();
+      const input = authPage.getByRole("textbox", { name: "Add task" });
+      await input.fill(kept);
+      await input.press("Enter");
+      await taskButton().waitFor({ timeout: 10_000 });
+      await authPage.getByRole("button", { name: "Save workspace" }).click();
+      await authPage.getByRole("dialog", { name: "Save your workspace" }).waitFor();
+      await sleep(200);
+      await authPage.screenshot({ path: join(shots, "account-anonymous.png") });
+      await authPage.getByRole("button", { name: "Create account with a passkey" }).click();
+      await authPage.getByRole("dialog", { name: "Signed in" }).waitFor({ timeout: 15_000 });
+      await authPage.screenshot({ path: join(shots, "account-signed-in.png") });
+      await authPage.keyboard.press("Escape");
+      await openDashboard(); // a reload: the server now finds the workspace through the session
+      await taskButton().waitFor({ timeout: 10_000 });
+      const { credentials } = await cdp.send("WebAuthn.getCredentials", { authenticatorId });
+      if (credentials.length !== 1 || !credentials[0].isResidentCredential)
+        throw new Error(`expected one discoverable passkey, got ${JSON.stringify(credentials)}`);
+      return `passkey for rp ${credentials[0].rpId}`;
+    },
+  );
+
+  await step("signing out leaves a fresh anonymous workspace", async () => {
+    await authPage.getByRole("button", { name: "Account", exact: true }).click();
+    await authPage.getByRole("button", { name: "Sign out" }).click();
+    await authPage.waitForURL(`${base}/dashboard`);
+    await authPage.getByRole("button", { name: "Save workspace" }).waitFor({ timeout: 15_000 });
+    await authPage.getByText("live", { exact: true }).waitFor({ timeout: 15_000 });
+    if (await taskButton().count()) throw new Error("the account's task is visible after sign-out");
+  });
+
+  await step("signing in with the passkey brings the task back", async () => {
+    await authPage.getByRole("button", { name: "Save workspace" }).click();
+    await authPage.getByRole("button", { name: "Sign in with a passkey" }).click();
+    await taskButton().waitFor({ timeout: 20_000 });
+    await authPage.getByRole("button", { name: "Account", exact: true }).waitFor();
+  });
+
+  await step("phone width account menu", async () => {
+    await authPage.setViewportSize({ width: 390, height: 844 });
+    await authPage.getByRole("button", { name: "Account", exact: true }).click();
+    await authPage.getByRole("dialog", { name: "Signed in" }).waitFor();
+    await sleep(200);
+    const overflow = await authPage.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    await authPage.screenshot({ path: join(shots, "account-phone.png") });
+    await authContext.close();
     if (overflow > 0) throw new Error(`horizontal overflow of ${overflow}px at phone width`);
   });
 

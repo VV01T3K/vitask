@@ -7,12 +7,20 @@ import {
 import { groqProvider } from "@earendil-works/pi-ai/providers/groq";
 import { DEFAULT_CONFIG, type CoachConfig } from "@vitask/coach";
 
+import type { AuthSettings } from "./auth.ts";
 import type { WorkspaceObject } from "./workspace-object.ts";
 
 export interface Env {
   readonly WORKSPACE: DurableObjectNamespace<WorkspaceObject>;
   readonly ASSETS?: Fetcher;
+  /** Accounts, sessions, passkeys and auth rate limits (Better Auth). Workspace data stays in WORKSPACE. */
+  readonly DB: D1Database;
   readonly COOKIE_SECRET?: string;
+  /** The app's public URL (origin), e.g. https://vitask.example.com. Passkeys are bound to its hostname. */
+  readonly BETTER_AUTH_URL?: string;
+  readonly BETTER_AUTH_SECRET?: string;
+  /** "apply": the Worker applies migrations/ to DB itself. Development on celld only (src/dev-migrations.ts). */
+  readonly D1_DEV_MIGRATIONS?: string;
   /** Comma-separated extra origins allowed to call the API, for a UI dev server on another port. */
   readonly ALLOWED_ORIGINS?: string;
   readonly COACH_PROVIDER?: string;
@@ -35,6 +43,26 @@ function positive(value: string | undefined, fallback: number): number {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) throw new Error(`Invalid numeric variable: ${value}`);
   return parsed;
+}
+
+export function extraOrigins(env: Env): string[] {
+  return (env.ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+/** The auth settings, or the names of the missing variables. */
+export function authSettingsFromEnv(env: Env): AuthSettings | { missing: string[] } {
+  const required = ["BETTER_AUTH_URL", "BETTER_AUTH_SECRET", "COOKIE_SECRET"] as const;
+  const missing = required.filter((name) => !env[name]);
+  if (missing.length > 0) return { missing };
+  return {
+    appUrl: env.BETTER_AUTH_URL!,
+    secret: env.BETTER_AUTH_SECRET!,
+    cookieSecret: env.COOKIE_SECRET!,
+    extraOrigins: extraOrigins(env),
+  };
 }
 
 export function configFromEnv(env: Env): CoachConfig {

@@ -11,16 +11,9 @@ export default defineConfig({
     port: Number(process.env.VITASK_WEB_PORT ?? 5173),
     strictPort: true,
     proxy: {
-      "/api": {
-        target: api,
-        ws: true,
-        changeOrigin: true,
-        // The Worker refuses foreign origins; through the proxy the browser's origin is the dev server's.
-        configure: (proxy) => {
-          proxy.on("proxyReq", (request) => request.setHeader("origin", api));
-          proxy.on("proxyReqWs", (request) => request.setHeader("origin", api));
-        },
-      },
+      // Transparent: Host and Origin stay the dev server's, so to the Worker the browser is same-origin, as in
+      // production, and passkeys and auth callbacks use http://localhost:5173 (BETTER_AUTH_URL in wrangler.jsonc).
+      "/api": { target: api, ws: true },
     },
   },
   // The Worker serves this directory as its static assets (apps/worker/wrangler.jsonc).

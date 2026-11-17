@@ -8,8 +8,23 @@ Layout: `apps/web` (Vite + React SPA), `apps/worker` (Cloudflare-style Worker wi
 on celld), `packages/protocol` (zod contract: domain, HTTP API, WebSocket messages), `packages/coach` (the AI coach
 on pi-durable). The web app builds into `apps/worker/public/`, which the Worker serves as static assets.
 
-Setup: copy `apps/worker/.dev.vars.example` to `apps/worker/.dev.vars` and set `GROQ_API_KEY`. celld must be on
-PATH or in `~/.local/bin`.
+Setup: copy `apps/worker/.dev.vars.example` to `apps/worker/.dev.vars` and set `GROQ_API_KEY` (keep
+`D1_DEV_MIGRATIONS=apply`). celld must be on PATH or in `~/.local/bin`.
+
+Accounts (`apps/worker/src/auth.ts`, `identity.ts`): Better Auth 1.7.25 with passkeys only, users and sessions in the
+D1 database `vitask-auth` (binding `DB`). Visitors start anonymous: a signed `vitask_ws` cookie names their
+`WorkspaceObject`, no account needed. A user row carries `workspaceId`, the object it owns; signing up adopts the
+visitor's anonymous workspace (user-create hook), and once owned, only that account's session reaches it. Signing in
+from an anonymous browser opens the account's workspace and leaves the anonymous one alone (no merge). Open the app at
+http://localhost:5173 in development: passkeys are bound to `BETTER_AUTH_URL`'s hostname, so 127.0.0.1 does not work.
+
+- D1 schema: `apps/worker/migrations/NNNN_*.sql`. After changing the auth options, `vpr --filter @vitask/worker
+  db:schema` prints the full Better Auth schema to diff against; `test/migrations.test.ts` fails while the files and
+  the options disagree. Apply: `celld dev` applies them itself (`D1_DEV_MIGRATIONS=apply`, a workaround in
+  `src/dev-migrations.ts`: `celld d1` cannot reach a dev database); `db:migrate:local` for `wrangler dev`;
+  `CELLD_BUCKET=s3://... vpr --filter @vitask/worker db:migrate:celld` for a fleet; `db:migrate:cloudflare` for D1.
+- Deploy to celld: `GROQ_API_KEY COOKIE_SECRET BETTER_AUTH_SECRET BETTER_AUTH_URL=https://... vpr --filter
+  @vitask/worker deploy:celld -- --bucket s3://...`, then `db:migrate:celld`. The secrets must be random, 32+ chars.
 
 - Check everything (format, lint, types; formatter and linter settings live in the root `vite.config.ts`):
 
@@ -29,7 +44,8 @@ vpr fix
 vpr build
 ```
 
-- Run the development servers (Worker on celld at :8790, web dev server at :5173 proxying `/api` and the WebSocket):
+- Run the development servers (Worker on celld at :8790, web dev server at :5173 proxying `/api` and the WebSocket,
+  keeping the browser's Host and Origin):
 
 ```bash
 vpr dev
@@ -42,7 +58,8 @@ vpr test
 ```
 
 - Integration test of the Worker on celld with a real model, and the browser end-to-end test (headless Playwright,
-  screenshots to `apps/web/test-results/` or `E2E_SCREENSHOTS`):
+  screenshots to `apps/web/test-results/` or `E2E_SCREENSHOTS`; it signs up, out and in with a passkey on a CDP
+  virtual authenticator):
 
 ```bash
 vpr --filter @vitask/worker test:integration
@@ -65,7 +82,7 @@ vpr eval --cases add-simple,inject-title        # also --category, --limit, --mo
 ```
 
 - CI (`.github/workflows/ci.yml`): check, unit tests, build and `eval:faux` on every push and PR; with the
-  `GROQ_API_KEY` secret also the Worker integration test on celld 0.6.3 and the real eval suite (fails under 80%
+  `GROQ_API_KEY` secret also the Worker integration test and the web e2e on celld 0.6.3 and the real eval suite (fails under 80%
   pass rate, report uploaded as the `eval-report` artifact).
 
 <!-- intent-skills:start -->

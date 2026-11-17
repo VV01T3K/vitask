@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { describeError } from "../lib/errors.ts";
 import { connect, useAppState, useClient } from "../state/client.tsx";
 import type { State, UiError } from "../state/types.ts";
+import { AccountMenu } from "./AccountMenu.tsx";
 import { ActivityDrawer } from "./ActivityDrawer.tsx";
 import { CoachPanel } from "./coach/CoachPanel.tsx";
 import { ConnectionBadge } from "./ConnectionBadge.tsx";
@@ -54,6 +55,7 @@ export function Dashboard() {
           <Activity aria-hidden="true" size={14} />
           <span className="hidden sm:inline">Activity</span>
         </button>
+        <AccountMenu />
       </Header>
       <div className="vitask-surface font-vitask-body text-vitask-text-primary flex-1">
         {!ready ? (
