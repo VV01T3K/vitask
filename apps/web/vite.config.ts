@@ -19,4 +19,6 @@ export default defineConfig({
   // The Worker serves this directory as its static assets (apps/worker/wrangler.jsonc).
   build: { outDir: "../worker/public", emptyOutDir: true },
   test: { include: ["test/**/*.test.ts"], environment: "node" },
+  // Reads GROQ_API_KEY and E2E_* from the environment and drives a real server, so it always runs.
+  run: { tasks: { "test:e2e": { command: "node scripts/e2e.mjs", cache: false } } },
 });
