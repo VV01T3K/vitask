@@ -26,6 +26,14 @@ const title = z.string().trim().min(1).max(LIMITS.taskTitle);
 const minutes = z.number().int().min(1).max(LIMITS.estimateMinutes);
 
 export const CreateTaskBody = z.strictObject({
+  /**
+   * Chosen by the client, so its optimistic copy and the server's `task.upserted` are the same task whichever
+   * arrives first. Creating an id that exists returns that task (a retry is safe).
+   */
+  id: z
+    .string()
+    .regex(/^task_[\w-]{8,59}$/)
+    .optional(),
   title,
   notes: z.string().max(LIMITS.taskNotes).optional(),
   parentId: Id.nullable().optional(),

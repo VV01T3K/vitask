@@ -7,7 +7,6 @@
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
-    "test:e2e": "node scripts/e2e.mjs",
     "check": "vp check",
     "fix": "vp check --fix"
   },

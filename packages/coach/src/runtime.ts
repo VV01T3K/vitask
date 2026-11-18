@@ -242,8 +242,8 @@ export class CoachRuntime {
   // -------------------------------------------------------------------------------------------------------------
   // The user's own actions; none of them goes through the coach or the approval gate.
 
-  createTask(body: CreateTaskBody): Promise<Task> {
-    return ops.createTask(this.deps, body);
+  createTask({ id, ...input }: CreateTaskBody): Promise<Task> {
+    return ops.createTask(this.deps, input, id);
   }
 
   updateTask(id: string, body: UpdateTaskBody): Promise<Task> {

@@ -161,8 +161,8 @@ vpr eval                                    # real eval suite, about 15 to 20 mi
 ```
 
 CI (`.github/workflows/ci.yml`) runs check, unit tests, build and the faux eval on every push and PR. With the
-`GROQ_API_KEY` secret it also runs the integration test and the e2e on celld, and the real eval suite, which fails
-under an 80% pass rate.
+`GROQ_API_KEY` secret it also runs the integration test and the e2e on celld. Real-model evals do not run in CI: the
+35-case suite uses most of Groq's free daily quota, so run it locally (`vpr eval`).
 
 ## Deploy
 
@@ -200,8 +200,6 @@ two-language stack.
   TLS proxy sets `X-Real-IP` (the deploy guide does).
 - **pi-durable 1.5.2 has no signals.** Approvals wait on a child task that the decision aborts. When a release with
   signals ships, the gate can park the tool call directly.
-- **Duplicate-task race.** When the WebSocket's `task.upserted` arrives before the HTTP response to an optimistic
-  create, the list can show the task twice. Fixing it needs client-chosen ids.
 - The free Groq tier allows about one full eval run per model per day.
 
 ## License
