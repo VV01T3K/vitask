@@ -166,8 +166,15 @@ under an 80% pass rate.
 
 ## Deploy
 
-[docs/deploy.md](docs/deploy.md) covers a celld fleet (bucket, two nodes behind Caddy), the cheapest single-VPS
-setup, and Cloudflare Workers.
+The quickest way is Docker Compose: one celld node, a local S3 bucket and Caddy for TLS on one machine.
+
+```bash
+cp .env.example .env    # domain, GROQ_API_KEY, secrets
+docker compose up -d --build
+```
+
+[docs/deploy.md](docs/deploy.md) covers it in detail, plus a celld fleet (two nodes behind Caddy, hosted bucket), a
+single VPS, and Cloudflare Workers.
 
 ## v1 → v2
 

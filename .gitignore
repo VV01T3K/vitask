@@ -25,6 +25,7 @@ dist
 
 
 .env*
+!.env.example
 # celld / wrangler local state and secrets
 .dev.vars
 .celld/

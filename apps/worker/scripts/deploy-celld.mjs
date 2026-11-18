@@ -3,9 +3,8 @@
 // the deployment in the fleet bucket. This script renders a temporary config with the secrets taken from the
 // environment, deploys it, and deletes it, so secrets never land in git.
 // Usage: GROQ_API_KEY=... COOKIE_SECRET=... BETTER_AUTH_SECRET=... BETTER_AUTH_URL=https://... \
-//          vpr --no-cache --filter @vitask/worker deploy:celld --bucket s3://... [other celld deploy flags]
-// (`--no-cache`: a cached vpr task does not see these variables.) Then apply D1 migrations:
-// CELLD_BUCKET=s3://... vpr --no-cache --filter @vitask/worker db:migrate:celld
+//          vpr --filter @vitask/worker deploy:celld --bucket s3://... [other celld deploy flags]
+// Then apply D1 migrations: CELLD_BUCKET=s3://... vpr --filter @vitask/worker db:migrate:celld
 import { spawnSync } from "node:child_process";
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";

@@ -1,12 +1,14 @@
 # Deploying vitask
 
-Three ways to run it, from most to least work:
+Four ways to run it:
 
-1. [A celld fleet](#celld-fleet): two nodes behind a TLS proxy, state in a bucket.
-2. [A single VPS](#single-vps): one celld container and Caddy. The cheapest setup.
-3. [Cloudflare Workers](#cloudflare-workers): no servers to run.
+1. [Docker Compose](#docker-compose): everything on one machine, bucket included. The simplest setup.
+2. [A celld fleet](#celld-fleet): two nodes behind a TLS proxy, state in a hosted bucket.
+3. [A single VPS](#single-vps): one celld container and Caddy, with a hosted bucket.
+4. [Cloudflare Workers](#cloudflare-workers): no servers to run.
 
-All three run the same Worker. Build the web app into the Worker's assets first:
+All of them run the same Worker. Docker Compose builds everything itself; for the others, build the web app into
+the Worker's assets first:
 
 ```bash
 vp install
@@ -31,6 +33,41 @@ Rotating `BETTER_AUTH_SECRET` signs everyone out.
 
 The other settings (budgets, rate limits, model) are `vars` in `apps/worker/wrangler.jsonc`; see
 [architecture.md](architecture.md#configuration).
+
+## Docker Compose
+
+`compose.yaml` runs the whole app on one machine with Docker: one celld node, a local S3 bucket
+([RustFS](https://rustfs.com)), and Caddy for TLS. Two one-shot jobs build the app, deploy it into the bucket and apply
+the D1 migrations.
+
+```bash
+cp .env.example .env    # fill in the domain, GROQ_API_KEY and three random secrets
+docker compose up -d --build
+```
+
+Point the domain's DNS at the machine and open ports 80 and 443; Caddy gets a Let's Encrypt certificate on first
+request. To try it locally, set `VITASK_DOMAIN=localhost`, `HTTPS_PORT=8443` and
+`BETTER_AUTH_URL=https://localhost:8443`: Caddy then uses its own local CA, which the browser will warn about.
+
+After pulling changes, `docker compose up -d --build deploy migrate` deploys the new version; the node switches to it
+within 30 s without a restart. `.env` holds every secret, and celld stores the app's secrets in the bucket
+([why](#2-deploy-the-worker)).
+
+Verified locally with `VITASK_DOMAIN=localhost`: the web e2e suite passes 14/14 against it
+(`E2E_BASE_URL=https://localhost:8443 vpr --filter @vitask/web test:e2e`), passkeys included, and workspaces survive
+`docker compose down` and `up`.
+
+What to know:
+
+- **The bucket is the database.** All state is in the `s3-data` volume: back it up. `docker compose down -v` deletes
+  every workspace and account.
+- **RustFS is not on celld's qualified list.** It passes `celld diagnose` (conditional writes) and the e2e suite, but
+  celld 0.6.3 qualifies only hosted stores (S3, R2, GCS, Tigris, Azure). MinIO, the one self-hosted store celld names
+  as passing its storage test, no longer publishes container images. For a production fleet, use a qualified bucket.
+- **The `deploy` job does not wait for the node.** celld answers no request, health checks included, until it serves
+  a deployment, so `migrate` waits for celld to turn healthy instead.
+- **The internal listener is open on the compose network.** It carries the unauthenticated operator API; no port is
+  published for it, and `migrate` uses it to reach D1.
 
 ## celld fleet
 
@@ -98,8 +135,8 @@ Run it under systemd with `TimeoutStopSec=60` (above celld's 40 s graceful hando
 **`CELLD_TRUST_FORWARDED_HEADERS=1` is required behind a TLS proxy.** celld builds `request.url` from the `Host`
 header with an `http` scheme unless it trusts `X-Forwarded-Proto`. The Worker refuses a state-changing request whose
 `Origin` differs from the request's own origin, so `https://vitask.example.com` against `http://vitask.example.com`
-is refused with 403 `forbidden_origin`. The mismatch was reproduced on `celld dev` (same request: 403 with an https
-`Origin`, 201 with http); the trusted-header fix itself has not been tried on a fleet yet. Set it only when the
+is refused with 403 `forbidden_origin`. With the setting, the [Docker Compose](#docker-compose) stack passes the full
+web e2e suite over https through Caddy. Set it only when the
 proxy replaces both `X-Forwarded-Proto` and `X-Forwarded-Host`, as Caddy does. If you cannot, add the public origin to
 `ALLOWED_ORIGINS` in `wrangler.jsonc` and deploy again.
 

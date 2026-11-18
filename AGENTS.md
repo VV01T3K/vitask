@@ -9,7 +9,7 @@ on celld), `packages/protocol` (zod contract: domain, HTTP API, WebSocket messag
 on pi-durable). The web app builds into `apps/worker/public/`, which the Worker serves as static assets.
 
 Docs: `README.md` (overview), `docs/architecture.md` (request flow, object lifecycle, data model, WebSocket
-protocol, approval flow, celld workarounds, decisions), `docs/deploy.md` (celld fleet, single VPS, Cloudflare),
+protocol, approval flow, celld workarounds, decisions), `docs/deploy.md` (Docker Compose, celld fleet, single VPS, Cloudflare),
 `docs/evals.md` (eval harness, judge, adding a case, latest numbers). Keep them in step with the code.
 
 Setup: copy `apps/worker/.dev.vars.example` to `apps/worker/.dev.vars` and set `GROQ_API_KEY` (keep
@@ -33,6 +33,8 @@ http://localhost:5173 in development: passkeys are bound to `BETTER_AUTH_URL`'s 
   `vpr --filter @vitask/worker deploy:celld --bucket s3://...`, then `db:migrate:celld`. The secrets
   must be random, 32+ chars. Do not put `--` before the celld flags (`celld deploy` rejects it).
   Nodes behind a TLS proxy need `CELLD_TRUST_FORWARDED_HEADERS=1`, or the same-origin check refuses https requests.
+- Self-host everything on one machine: `cp .env.example .env`, fill it in, `docker compose up -d --build` (celld,
+  RustFS bucket, Caddy; `compose.yaml`). Use your own project name (`-p`) and ports on this machine.
 
 - Check everything (format, lint, types; formatter and linter settings live in the root `vite.config.ts`):
 
@@ -72,6 +74,7 @@ vpr test
 ```bash
 vpr --filter @vitask/worker test:integration
 vpr --filter @vitask/web test:e2e
+E2E_BASE_URL=https://localhost:8443 vpr --filter @vitask/web test:e2e   # against a running deployment
 ```
 
 - Coach evals (`packages/evals`): the real coach on pi-durable `MemoryStorage` against a golden dataset, with

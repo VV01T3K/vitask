@@ -2,6 +2,8 @@
 // End-to-end run of the built web app against the real Worker on `celld dev`, in headless Chromium, with a real model.
 // Usage: vpr test:e2e   (needs celld on PATH or ~/.local/bin and GROQ_API_KEY in apps/worker/.dev.vars or the env)
 // Screenshots go to E2E_SCREENSHOTS (default apps/web/test-results/).
+// E2E_BASE_URL=https://localhost:8443 runs the same steps against a running deployment (such as the compose stack)
+// instead of building and starting `celld dev`; its certificate is not checked.
 import { spawn, spawnSync } from "node:child_process";
 import {
   cpSync,
@@ -27,62 +29,67 @@ const celld =
   (existsSync(join(homedir(), ".local/bin/celld")) ? join(homedir(), ".local/bin/celld") : "celld");
 const port = 20_000 + Math.floor(Math.random() * 20_000);
 // localhost, not 127.0.0.1: WebAuthn needs a domain as its relying party id (and localhost is a secure context).
-const base = `http://localhost:${port}`;
+const target = process.env.E2E_BASE_URL?.replace(/\/$/, "");
+const base = target ?? `http://localhost:${port}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [];
 
-// 1. Build the app into the Worker's asset directory.
-const build = spawnSync(join(webDir, "node_modules/.bin/vp"), ["build"], {
-  cwd: webDir,
-  stdio: "inherit",
-});
-if (build.status !== 0) process.exit(build.status ?? 1);
-
-// 2. A throwaway celld project around the real Worker, so `--clean` touches only this run's state.
-const project = mkdtempSync(join(tmpdir(), "vitask-e2e-"));
-const config = JSON.parse(
-  readFileSync(join(workerDir, "wrangler.jsonc"), "utf8")
-    .split("\n")
-    .filter((line) => !line.trim().startsWith("//"))
-    .join("\n")
-    .replace(/,(\s*[}\]])/g, "$1"),
-);
-delete config.$schema;
-symlinkSync(join(workerDir, "src"), join(project, "src"));
-symlinkSync(join(workerDir, "migrations"), join(project, "migrations"));
-// celld dev cannot run `celld d1 migrations apply`, so the Worker applies them (apps/worker/src/dev-migrations.ts).
-Object.assign(config.vars, { BETTER_AUTH_URL: base, D1_DEV_MIGRATIONS: "apply" });
-cpSync(join(workerDir, "public"), join(project, "public"), { recursive: true });
-writeFileSync(join(project, "wrangler.jsonc"), JSON.stringify(config, null, 2));
-if (existsSync(join(workerDir, ".dev.vars"))) {
-  symlinkSync(join(workerDir, ".dev.vars"), join(project, ".dev.vars")); // never copy the key
-} else if (process.env.GROQ_API_KEY) {
-  writeFileSync(join(project, ".dev.vars"), `GROQ_API_KEY=${process.env.GROQ_API_KEY}\n`, {
-    mode: 0o600,
-  });
-} else {
-  console.error("No GROQ_API_KEY: put it in apps/worker/.dev.vars or the environment.");
-  process.exit(2);
-}
-
-const child = spawn(celld, ["dev", project, "--port", String(port), "--no-watch", "--clean"], {
-  cwd: project,
-  detached: true, // its own process group, so one kill reaches every child
-  stdio: ["ignore", "pipe", "pipe"],
-  env: {
-    ...process.env,
-    CELLD_ESBUILD: join(workerDir, "node_modules/.bin/esbuild"),
-    NO_COLOR: "1",
-  },
-});
+let project;
 let log = "";
-child.stdout.on("data", (data) => (log += data));
-child.stderr.on("data", (data) => (log += data));
-const killCelld = () => {
-  try {
-    process.kill(-child.pid, "SIGKILL");
-  } catch {}
-};
+let killCelld = () => {};
+if (!target) {
+  // 1. Build the app into the Worker's asset directory.
+  const build = spawnSync(join(webDir, "node_modules/.bin/vp"), ["build"], {
+    cwd: webDir,
+    stdio: "inherit",
+  });
+  if (build.status !== 0) process.exit(build.status ?? 1);
+
+  // 2. A throwaway celld project around the real Worker, so `--clean` touches only this run's state.
+  project = mkdtempSync(join(tmpdir(), "vitask-e2e-"));
+  const config = JSON.parse(
+    readFileSync(join(workerDir, "wrangler.jsonc"), "utf8")
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("//"))
+      .join("\n")
+      .replace(/,(\s*[}\]])/g, "$1"),
+  );
+  delete config.$schema;
+  symlinkSync(join(workerDir, "src"), join(project, "src"));
+  symlinkSync(join(workerDir, "migrations"), join(project, "migrations"));
+  // celld dev cannot run `celld d1 migrations apply`, so the Worker applies them (apps/worker/src/dev-migrations.ts).
+  Object.assign(config.vars, { BETTER_AUTH_URL: base, D1_DEV_MIGRATIONS: "apply" });
+  cpSync(join(workerDir, "public"), join(project, "public"), { recursive: true });
+  writeFileSync(join(project, "wrangler.jsonc"), JSON.stringify(config, null, 2));
+  if (existsSync(join(workerDir, ".dev.vars"))) {
+    symlinkSync(join(workerDir, ".dev.vars"), join(project, ".dev.vars")); // never copy the key
+  } else if (process.env.GROQ_API_KEY) {
+    writeFileSync(join(project, ".dev.vars"), `GROQ_API_KEY=${process.env.GROQ_API_KEY}\n`, {
+      mode: 0o600,
+    });
+  } else {
+    console.error("No GROQ_API_KEY: put it in apps/worker/.dev.vars or the environment.");
+    process.exit(2);
+  }
+
+  const child = spawn(celld, ["dev", project, "--port", String(port), "--no-watch", "--clean"], {
+    cwd: project,
+    detached: true, // its own process group, so one kill reaches every child
+    stdio: ["ignore", "pipe", "pipe"],
+    env: {
+      ...process.env,
+      CELLD_ESBUILD: join(workerDir, "node_modules/.bin/esbuild"),
+      NO_COLOR: "1",
+    },
+  });
+  child.stdout.on("data", (data) => (log += data));
+  child.stderr.on("data", (data) => (log += data));
+  killCelld = () => {
+    try {
+      process.kill(-child.pid, "SIGKILL");
+    } catch {}
+  };
+}
 
 async function step(name, fn) {
   const started = Date.now();
@@ -99,7 +106,7 @@ async function step(name, fn) {
 
 let browser;
 try {
-  for (let i = 0; ; i++) {
+  for (let i = 0; !target; i++) {
     try {
       if ((await fetch(`http://127.0.0.1:${port}/api/health`)).ok) break;
     } catch {}
@@ -109,6 +116,7 @@ try {
   mkdirSync(shots, { recursive: true });
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
+    ignoreHTTPSErrors: Boolean(target),
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
     colorScheme: "dark",
@@ -201,6 +209,7 @@ try {
 
   await step("phone width screenshot", async () => {
     const phone = await browser.newContext({
+      ignoreHTTPSErrors: Boolean(target),
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 2,
       isMobile: true,
@@ -221,6 +230,7 @@ try {
 
   // Accounts: a fresh browser with a virtual passkey authenticator (Chrome DevTools Protocol, WebAuthn domain).
   const authContext = await browser.newContext({
+    ignoreHTTPSErrors: Boolean(target),
     viewport: { width: 1280, height: 860 },
     deviceScaleFactor: 2,
     colorScheme: "dark",
@@ -313,7 +323,7 @@ try {
   await browser?.close();
   killCelld();
   await sleep(500);
-  rmSync(project, { recursive: true, force: true });
+  if (project) rmSync(project, { recursive: true, force: true });
 }
 
 const failed = results.filter((r) => !r.ok);
