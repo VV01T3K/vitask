@@ -109,7 +109,21 @@ export function summarize(results: readonly CaseResult[]): Summary {
 
 const INFRA = /\b429\b|rate limit|timed out|aborted/i;
 
+/** Provider error bodies name the account (`org_...`); reports are committed, so they never keep it. */
+const ACCOUNT_ID = /\borg_[A-Za-z0-9]+/g;
+const scrub = (text: string) => text.replace(ACCOUNT_ID, "org_[redacted]");
+
 async function evaluate(testCase: EvalCase, options: SuiteOptions): Promise<CaseResult> {
+  const result = await grade(testCase, options);
+  return {
+    ...result,
+    error: result.error === null ? null : scrub(result.error),
+    failures: result.failures.map(scrub),
+    transcript: result.transcript.map(scrub),
+  };
+}
+
+async function grade(testCase: EvalCase, options: SuiteOptions): Promise<CaseResult> {
   const outcome = await runCase(testCase, {
     models: options.models,
     provider: options.target.provider,

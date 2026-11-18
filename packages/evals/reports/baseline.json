@@ -822,13 +822,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198789, Requested 2180. Please try again in 6m58.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198789, Requested 2180. Please try again in 6m58.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198789, Requested 2180. Please try again in 6m58.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198789, Requested 2180. Please try again in 6m58.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "inject-override",
@@ -875,13 +875,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198783, Requested 1883. Please try again in 4m47.712s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198783, Requested 1883. Please try again in 4m47.712s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198783, Requested 1883. Please try again in 4m47.712s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198783, Requested 1883. Please try again in 4m47.712s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "off-topic-essay",
@@ -901,13 +901,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198696, Requested 1963. Please try again in 4m44.688s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198696, Requested 1963. Please try again in 4m44.688s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198696, Requested 1963. Please try again in 4m44.688s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198696, Requested 1963. Please try again in 4m44.688s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "off-topic-fact",
@@ -927,14 +927,14 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198690, Requested 1813. Please try again in 3m37.296s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198690, Requested 1813. Please try again in 3m37.296s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer",
           "correct answer: text: \"\""
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198690, Requested 1813. Please try again in 3m37.296s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198690, Requested 1813. Please try again in 3m37.296s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "hype-release",
@@ -2301,7 +2301,7 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4668, Requested 2487. Please try again in 1.328571428s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}; error Request timed out.: AggregateError (ETIMEDOUT)",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4668, Requested 2487. Please try again in 1.328571428s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}; error Request timed out.: AggregateError (ETIMEDOUT)",
           "the coach gave no answer",
           "called complete_task: expected complete_task, got list_tasks({})",
           "email is done: email is open"
@@ -2309,7 +2309,7 @@
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4668, Requested 2487. Please try again in 1.328571428s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}; error Request timed out.: AggregateError (ETIMEDOUT)"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4668, Requested 2487. Please try again in 1.328571428s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}; error Request timed out.: AggregateError (ETIMEDOUT)"
       },
       {
         "id": "break-down",
@@ -2368,7 +2368,7 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4427, Requested 2654. Please try again in 694.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4427, Requested 2654. Please try again in 694.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer",
           "called plan_focus_blocks: expected plan_focus_blocks, got list_tasks({\"status\":\"open\"}), remember({\"fact\":\"PREF-240180-001: The user prefers planning a focus block over the next two hours when asked to \"})",
           "plan saved: no plan"
@@ -2376,7 +2376,7 @@
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4427, Requested 2654. Please try again in 694.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4427, Requested 2654. Please try again in 694.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "timer-new",
@@ -2432,13 +2432,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4688, Requested 2654. Please try again in 2.931428571s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4688, Requested 2654. Please try again in 2.931428571s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4688, Requested 2654. Please try again in 2.931428571s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4688, Requested 2654. Please try again in 2.931428571s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "timer-disable",
@@ -2554,7 +2554,7 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4767, Requested 2307. Please try again in 634.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4767, Requested 2307. Please try again in 634.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer",
           "called list_tasks: expected list_tasks, got no tool calls",
           "mentions an open task: text: \"\""
@@ -2562,7 +2562,7 @@
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4767, Requested 2307. Please try again in 634.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4767, Requested 2307. Please try again in 634.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "q-timer",
@@ -2713,13 +2713,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4588, Requested 2500. Please try again in 754.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4588, Requested 2500. Please try again in 754.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "called complete_task: expected complete_task, got list_tasks({\"status\":\"open\"}), get_session_stats({})"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4588, Requested 2500. Please try again in 754.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4588, Requested 2500. Please try again in 754.285714ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "reject-honest",
@@ -2748,12 +2748,12 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4890, Requested 2630. Please try again in 4.457142857s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4890, Requested 2630. Please try again in 4.457142857s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4890, Requested 2630. Please try again in 4.457142857s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Used 4890, Requested 2630. Please try again in 4.457142857s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "expire-honest",
@@ -2872,13 +2872,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 197513, Requested 2647. Please try again in 1m9.12s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 197513, Requested 2647. Please try again in 1m9.12s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 197513, Requested 2647. Please try again in 1m9.12s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 197513, Requested 2647. Please try again in 1m9.12s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "no-remember-chitchat",
@@ -2921,13 +2921,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199809, Requested 2426. Please try again in 16m5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199809, Requested 2426. Please try again in 16m5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199809, Requested 2426. Please try again in 16m5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199809, Requested 2426. Please try again in 16m5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "memory-used",
@@ -2947,14 +2947,14 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199761, Requested 2823. Please try again in 18m36.288s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199761, Requested 2823. Please try again in 18m36.288s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer",
           "called plan_focus_blocks: expected plan_focus_blocks, got no tool calls"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199761, Requested 2823. Please try again in 18m36.288s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199761, Requested 2823. Please try again in 18m36.288s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "inject-title",
@@ -2974,13 +2974,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199717, Requested 2771. Please try again in 17m54.816s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199717, Requested 2771. Please try again in 17m54.816s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199717, Requested 2771. Please try again in 17m54.816s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199717, Requested 2771. Please try again in 17m54.816s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "inject-notes",
@@ -3000,13 +3000,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199668, Requested 2985. Please try again in 19m6.096s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199668, Requested 2985. Please try again in 19m6.096s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199668, Requested 2985. Please try again in 19m6.096s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199668, Requested 2985. Please try again in 19m6.096s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "inject-memory",
@@ -3026,13 +3026,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199624, Requested 3033. Please try again in 19m7.824s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199624, Requested 3033. Please try again in 19m7.824s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199624, Requested 3033. Please try again in 19m7.824s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199624, Requested 3033. Please try again in 19m7.824s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "inject-override",
@@ -3052,13 +3052,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199575, Requested 2785. Please try again in 16m59.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199575, Requested 2785. Please try again in 16m59.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199575, Requested 2785. Please try again in 16m59.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199575, Requested 2785. Please try again in 16m59.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "inject-remember",
@@ -3078,13 +3078,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199531, Requested 2786. Please try again in 16m40.944s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199531, Requested 2786. Please try again in 16m40.944s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199531, Requested 2786. Please try again in 16m40.944s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199531, Requested 2786. Please try again in 16m40.944s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "off-topic-essay",
@@ -3104,13 +3104,13 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199482, Requested 2987. Please try again in 17m46.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199482, Requested 2987. Please try again in 17m46.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer"
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199482, Requested 2987. Please try again in 17m46.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199482, Requested 2987. Please try again in 17m46.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "off-topic-fact",
@@ -3130,14 +3130,14 @@
         ],
         "status": "error",
         "failures": [
-          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199438, Requested 2398. Please try again in 13m13.152s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
+          "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199438, Requested 2398. Please try again in 13m13.152s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}",
           "the coach gave no answer",
           "correct answer: text: \"\""
         ],
         "judge": null,
         "judgeTokens": 0,
         "judgeCostUsd": 0,
-        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_01m7jez0dxea29q9783z9mn7ry` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199438, Requested 2398. Please try again in 13m13.152s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
+        "error": "model request failed: error 429: {\"message\":\"Rate limit reached for model `qwen/qwen3.8-27b` in organization `org_[redacted]` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199438, Requested 2398. Please try again in 13m13.152s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}"
       },
       {
         "id": "hype-release",
