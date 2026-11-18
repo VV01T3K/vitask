@@ -72,7 +72,7 @@ vpr eval --help
 ```
 
 Other options: `--limit <n>`, `--concurrency <n>` (cases in flight per model, default 2), `--budget <usd>` (stop
-starting cases past this spend per model, default 0.5), `--min-pass-rate <0..1>` (exit 1 below it; CI uses 0.8),
+starting cases past this spend per model, default 0.5), `--min-pass-rate <0..1>` (exit 1 below it; CI uses 0.8 on its 8 core cases, see `.github/workflows/ci.yml`),
 `--name <base>` and `--out <dir>` for the report files. Reports are written as Markdown and JSON to
 `packages/evals/reports/`, which git ignores except `baseline.*`.
 

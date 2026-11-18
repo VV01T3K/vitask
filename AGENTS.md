@@ -93,8 +93,9 @@ vpr eval --cases add-simple,inject-title        # also --category, --limit, --mo
 ```
 
 - CI (`.github/workflows/ci.yml`): check, unit tests, build and `eval:faux` on every push and PR; with the
-  `GROQ_API_KEY` secret also the Worker integration test and the web e2e on celld 0.6.3 and the real eval suite (fails under 80%
-  pass rate, report uploaded as the `eval-report` artifact).
+  `GROQ_API_KEY` secret also the Worker integration test and the web e2e on celld 0.6.3 and 8 core eval cases (fails under 80%
+  pass rate, report uploaded as the `eval-report` artifact). The full suite is too big for Groq's free daily quota
+  in CI; run it locally.
 
 <!-- intent-skills:start -->
 
