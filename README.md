@@ -161,9 +161,8 @@ vpr eval                                    # real eval suite, about 15 to 20 mi
 ```
 
 CI (`.github/workflows/ci.yml`) runs check, unit tests, build and the faux eval on every push and PR. With the
-`GROQ_API_KEY` secret it also runs the integration test and the e2e on celld, and, on pushes to main and manual runs,
-8 core eval cases, failing under an 80% pass rate. They use about 26k of Groq's 200k free daily tokens, so they do not
-run on every PR push; the full 35-case suite uses most of a day's quota and runs locally (`vpr eval`).
+`GROQ_API_KEY` secret it also runs the integration test and the e2e on celld. Real-model evals do not run in CI: the
+35-case suite uses most of Groq's free daily quota, so run it locally (`vpr eval`).
 
 ## Deploy
 
