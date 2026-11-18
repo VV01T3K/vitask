@@ -94,10 +94,10 @@ export function createActions({ store, http, socket, now, newId, notify }: Actio
     addTask(input: z.input<typeof CreateTaskBody>): Promise<UiError | null> {
       const parsed = CreateTaskBody.safeParse(input);
       if (!parsed.success) return Promise.resolve(invalid(parsed.error));
-      const body = parsed.data;
+      const body = { ...parsed.data, id: parsed.data.id ?? `task_${newId()}` };
       const at = now();
       const task: Task = {
-        id: `tmp-${newId()}`,
+        id: body.id,
         title: body.title,
         notes: body.notes ?? "",
         status: "open",

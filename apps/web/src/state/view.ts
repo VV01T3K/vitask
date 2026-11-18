@@ -11,7 +11,8 @@ export function viewTasks(state: ViewSource): Task[] {
   for (const op of state.ops) {
     switch (op.kind) {
       case "task.create":
-        tasks = [...tasks, op.task];
+        // The live update can land before the HTTP answer; the server's copy is the same task.
+        if (!tasks.some((task) => task.id === op.task.id)) tasks = [...tasks, op.task];
         break;
       case "task.patch":
         tasks = tasks.map((task) => (task.id === op.taskId ? { ...task, ...op.patch } : task));

@@ -217,6 +217,15 @@ describe("budgets and limits", () => {
 });
 
 describe("tasks and hype", () => {
+  it("creates a task under the client's id, once", async () => {
+    const { runtime, store } = await coach();
+    const first = await runtime.createTask({ id: "task_client123", title: "Mine" });
+    const retry = await runtime.createTask({ id: "task_client123", title: "Mine" });
+    expect(first.id).toBe("task_client123");
+    expect(retry).toEqual(first);
+    expect((await store.listTasks()).filter((t) => t.title === "Mine")).toHaveLength(1);
+  });
+
   it("hypes a directly completed task once", async () => {
     const { runtime, store, events } = await coach();
     const task = await runtime.createTask({ title: "Inbox zero" });

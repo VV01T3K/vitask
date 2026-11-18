@@ -200,8 +200,6 @@ two-language stack.
   TLS proxy sets `X-Real-IP` (the deploy guide does).
 - **pi-durable 1.5.2 has no signals.** Approvals wait on a child task that the decision aborts. When a release with
   signals ships, the gate can park the tool call directly.
-- **Duplicate-task race.** When the WebSocket's `task.upserted` arrives before the HTTP response to an optimistic
-  create, the list can show the task twice. Fixing it needs client-chosen ids.
 - The free Groq tier allows about one full eval run per model per day.
 
 ## License

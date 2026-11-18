@@ -12,8 +12,10 @@ function setup(respond: (method: string, path: string, body: unknown) => unknown
   store.dispatch({ type: "snapshot", snapshot: snapshot() });
   const notified: UiError[] = [];
   const seen: unknown[] = [];
+  const bodies: unknown[] = [];
   const fakeHttp = (async (method: string, path: string, _schema: unknown, body?: unknown) => {
-    const data = respond(method, path, body);
+    bodies.push(body);
+    const data = await respond(method, path, body);
     if (data instanceof RequestFailed) throw data;
     return { data, serverDate: null };
   }) as unknown as typeof http;
@@ -37,7 +39,7 @@ function setup(respond: (method: string, path: string, body: unknown) => unknown
     newId: () => `id-${++id}-padding`,
     notify: (error) => notified.push(error),
   });
-  return { store, actions, notified, seen };
+  return { store, actions, notified, seen, bodies };
 }
 
 describe("actions", () => {
@@ -47,6 +49,20 @@ describe("actions", () => {
     expect(viewTasks(store.getState()).at(-1)).toMatchObject({ title: "Draft", status: "open" });
     expect(await pending).toBeNull();
     expect(viewTasks(store.getState()).map((t) => t.id)).toEqual(["t1", "t2"]);
+  });
+
+  it("shows a new task once when its live update arrives before the HTTP answer", async () => {
+    let answer: (value: unknown) => void = () => {};
+    const { store, actions, bodies } = setup(() => new Promise((resolve) => (answer = resolve)));
+    const pending = actions.addTask({ title: "Draft" });
+    const id = (bodies[0] as { id: string }).id;
+    expect(id).toMatch(/^task_/);
+    const created = task({ id, title: "Draft" });
+    store.dispatch({ type: "message", message: { type: "task.upserted", task: created } });
+    expect(viewTasks(store.getState()).filter((t) => t.title === "Draft")).toHaveLength(1);
+    answer(created);
+    expect(await pending).toBeNull();
+    expect(viewTasks(store.getState()).map((t) => t.id)).toEqual(["t1", id]);
   });
 
   it("validates with the protocol schema before sending", async () => {
