@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DO_NOT_TRACK: "1"
+
+jobs:
+  check:
+    name: Check, test, build, faux eval
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.13.1
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          version: 1.0.0
+          node-manager: false
+          run-install: false
+      - name: Install
+        run: vp install --frozen-lockfile
+      - name: Check (format, lint, types)
+        run: vpr check
+      - name: Unit tests
+        run: vpr test
+      - name: Build
+        run: vpr build
+      - name: Eval harness on the faux model
+        run: vpr eval:faux --name faux
+
+  # Real-model evals do not run in CI (they would use up Groq's free daily quota); run them locally with `vpr eval`.
+  live:
+    name: Worker integration and web e2e (Groq)
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    # Free-tier Groq limits are per key, so real runs never overlap.
+    concurrency:
+      group: groq
+      cancel-in-progress: false
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+    steps:
+      # Secrets are not available to fork PRs; the job then passes without calling a model.
+      - name: Look for the Groq key
+        id: key
+        run: |
+          if [ -n "$GROQ_API_KEY" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::GROQ_API_KEY is not available; skipping the integration and e2e tests."
+          fi
+      - if: steps.key.outputs.available == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: steps.key.outputs.available == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.13.1
+      - if: steps.key.outputs.available == 'true'
+        uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          version: 1.0.0
+          node-manager: false
+          run-install: false
+      - if: steps.key.outputs.available == 'true'
+        name: Install
+        run: vp install --frozen-lockfile
+      - if: steps.key.outputs.available == 'true'
+        name: Install celld
+        run: curl -fsSL https://celld.dev/install.sh | CELLD_VERSION=v0.6.3 sh
+      - if: steps.key.outputs.available == 'true'
+        name: Worker integration test on celld
+        run: vpr --filter @vitask/worker test:integration
+      - if: "!cancelled() && steps.key.outputs.available == 'true'"
+        name: Install headless Chromium
+        working-directory: apps/web
+        run: node_modules/.bin/playwright install --with-deps chromium
+      # The browser end-to-end run on celld, including passkey sign-up and sign-in with a virtual authenticator.
+      - if: "!cancelled() && steps.key.outputs.available == 'true'"
+        name: Web end-to-end test on celld
+        run: vpr --filter @vitask/web test:e2e
+      - if: "failure() && steps.key.outputs.available == 'true'"
+        name: Upload the e2e screenshots
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-screenshots
+          path: apps/web/test-results/
+          if-no-files-found: ignore

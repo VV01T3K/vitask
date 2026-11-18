@@ -1,12 +1,13 @@
 packages:
   - apps/*
-  - shared/*
+  - packages/*
 
 catalog:
-  "@durable-streams/server": ^0.3.1
+  "@better-auth/passkey": 1.7.25
   "@fontsource-variable/geist": ^5.2.8
   "@fontsource-variable/geist-mono": ^5.2.7
   "@types/node": ^24
+  better-auth: 1.7.25
   typescript: ^6
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vite-plus: latest

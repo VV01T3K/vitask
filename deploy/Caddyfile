@@ -1,0 +1,8 @@
+# A real domain gets a Let's Encrypt certificate; localhost gets one from Caddy's local CA.
+{$VITASK_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy celld:8080 {
+		# celld sets no client-IP header; Better Auth's rate limit reads X-Real-IP.
+		header_up X-Real-IP {remote_host}
+	}
+}

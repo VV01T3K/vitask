@@ -4,7 +4,39 @@ use vpr (pnpm under the hood)
 
 Never change staged state
 
-- Check everything:
+Layout: `apps/web` (Vite + React SPA), `apps/worker` (Cloudflare-style Worker with one Durable Object per user, run
+on celld), `packages/protocol` (zod contract: domain, HTTP API, WebSocket messages), `packages/coach` (the AI coach
+on pi-durable). The web app builds into `apps/worker/public/`, which the Worker serves as static assets.
+
+Docs: `README.md` (overview), `docs/architecture.md` (request flow, object lifecycle, data model, WebSocket
+protocol, approval flow, celld workarounds, decisions), `docs/deploy.md` (Docker Compose, celld fleet, single VPS, Cloudflare),
+`docs/evals.md` (eval harness, judge, adding a case, latest numbers). Keep them in step with the code.
+
+Setup: copy `apps/worker/.dev.vars.example` to `apps/worker/.dev.vars` and set `GROQ_API_KEY` (keep
+`D1_DEV_MIGRATIONS=apply`). celld must be on PATH or in `~/.local/bin`.
+
+Accounts (`apps/worker/src/auth.ts`, `identity.ts`): Better Auth 1.7.25 with passkeys only, users and sessions in the
+D1 database `vitask-auth` (binding `DB`). Visitors start anonymous: a signed `vitask_ws` cookie names their
+`WorkspaceObject`, no account needed. A user row carries `workspaceId`, the object it owns; signing up adopts the
+visitor's anonymous workspace (user-create hook), and once owned, only that account's session reaches it. Signing in
+from an anonymous browser opens the account's workspace and leaves the anonymous one alone (no merge). Open the app at
+http://localhost:5173 in development: passkeys are bound to `BETTER_AUTH_URL`'s hostname, so 127.0.0.1 does not work.
+
+- D1 schema: `apps/worker/migrations/NNNN_*.sql`. After changing the auth options,
+  `vpr --filter @vitask/worker db:schema` prints the full Better Auth schema to diff against;
+  `test/migrations.test.ts` fails while the files and the options disagree. Apply: `celld dev` applies them itself
+  (`D1_DEV_MIGRATIONS=apply`, a workaround in `src/dev-migrations.ts`: `celld d1` cannot reach a dev database); `db:migrate:local` for `wrangler dev`;
+  `CELLD_BUCKET=s3://... vpr --filter @vitask/worker db:migrate:celld` for a fleet;
+  `db:migrate:cloudflare` for D1.
+- Deploy to celld (details in `docs/deploy.md`): with `GROQ_API_KEY`, `COOKIE_SECRET`, `BETTER_AUTH_SECRET` and
+  `BETTER_AUTH_URL=https://...` in the environment, run
+  `vpr --filter @vitask/worker deploy:celld --bucket s3://...`, then `db:migrate:celld`. The secrets
+  must be random, 32+ chars. Do not put `--` before the celld flags (`celld deploy` rejects it).
+  Nodes behind a TLS proxy need `CELLD_TRUST_FORWARDED_HEADERS=1`, or the same-origin check refuses https requests.
+- Self-host everything on one machine: `cp .env.example .env`, fill it in, `docker compose up -d --build` (celld,
+  RustFS bucket, Caddy; `compose.yaml`). Use your own project name (`-p`) and ports on this machine.
+
+- Check everything (format, lint, types; formatter and linter settings live in the root `vite.config.ts`):
 
 ```bash
 vpr check
@@ -16,17 +48,53 @@ vpr check
 vpr fix
 ```
 
-- Build the monorepo:
+- Build (the web app into the Worker's assets):
 
 ```bash
-vpr -r build
+vpr build
 ```
 
-- Run the development servers:
+- Run the development servers (Worker on celld at :8790, web dev server at :5173 proxying `/api` and the WebSocket,
+  keeping the browser's Host and Origin):
 
 ```bash
 vpr dev
 ```
+
+- Unit tests:
+
+```bash
+vpr test
+```
+
+- Integration test of the Worker on celld with a real model, and the browser end-to-end test (headless Playwright,
+  screenshots to `apps/web/test-results/` or `E2E_SCREENSHOTS`; it signs up, out and in with a passkey on a CDP
+  virtual authenticator):
+
+```bash
+vpr --filter @vitask/worker test:integration
+vpr --filter @vitask/web test:e2e
+E2E_BASE_URL=https://localhost:8443 vpr --filter @vitask/web test:e2e   # against a running deployment
+```
+
+- Coach evals (`packages/evals`): the real coach on pi-durable `MemoryStorage` against a golden dataset, with
+  deterministic checks and an LLM judge for text quality. Reports go to `packages/evals/reports/` (git-ignored except
+  `baseline.*`). Real runs read `GROQ_API_KEY` from the env or `apps/worker/.dev.vars`; the free Groq tier allows
+  8k tokens per minute and a daily token cap per model, so a full run takes 15 to 20 minutes, costs about 4 cents,
+  and one model fits about one run per day (quota refusals are reported as errors, not failures). `eval:faux` needs
+  no key and runs in CI.
+
+```bash
+vpr eval:faux                                   # scripted faux model, no key
+vpr eval                                        # production model (openai/gpt-oss-120b)
+vpr eval:matrix                                 # gpt-oss-120b, gpt-oss-20b, qwen3.8-27b side by side
+vpr eval --cases add-simple,inject-title        # also --category, --limit, --model, --judge, --budget,
+                                                # --concurrency, --min-pass-rate, --name, --out (see --help)
+```
+
+- CI (`.github/workflows/ci.yml`): check, unit tests, build and `eval:faux` on every push and PR; with the
+  `GROQ_API_KEY` secret also the Worker integration test and the web e2e on celld 0.6.3. Real-model evals
+  never run in CI (Groq's free tier allows 200k tokens a day; the full suite uses most of it): run them locally.
 
 <!-- intent-skills:start -->
 
@@ -39,38 +107,6 @@ Before substantial work:
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
 - Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
 
-# Skill mappings - load `use` with `npx @tanstack/intent@latest load <use>`.
+No installed package ships intent skills at the moment, so there are no mappings. Add them here when one does.
 
-# Fallback: run `npx @tanstack/intent@latest list` for less common local skills.
-
-skills:
-
-- when: "TanStack Start app setup, SSR, server functions, middleware, routes, or deployment"
-  use: "@tanstack/start-client-core#start-core"
-- when: "React bindings for TanStack Start, StartClient, StartServer, useServerFn, or RSC"
-  use: "@tanstack/react-start#react-start"
-- when: "TanStack Router routes, navigation, params, search, guards, loaders, errors, SSR, or type safety"
-  use: "@tanstack/router-core#router-core"
-- when: "TanStack Router plugin, route generation, routesDirectory, target framework, or code splitting config"
-  use: "@tanstack/router-plugin#router-plugin"
-- when: "virtual file routes or programmatic route tree configuration"
-  use: "@tanstack/virtual-file-routes#virtual-file-routes"
-- when: "TanStack AI chat, tools, structured outputs, media, adapters, middleware, logs, or AG-UI"
-  use: "@tanstack/ai#ai-core"
-- when: "Durable Streams client usage, stream creation, offsets, reading, writing, or subscriptions"
-  use: "@durable-streams/client#getting-started"
-- when: "Durable Streams server, @durable-streams/server, DurableStreamTestServer, Caddy, deployment, or production"
-  use: "@durable-streams/client#server-deployment"
-- when: "Durable Streams typed state, state schemas, createStreamDB, or stream-backed TanStack DB"
-  use: "@durable-streams/state#stream-db"
-- when: "TanStack DB collections, live queries, mutations, transactions, sync adapters, or persistence"
-  use: "@tanstack/db#db-core"
-- when: "TanStack Devtools app setup, plugins, panels, marketplace, or production behavior"
-  use: "@tanstack/devtools#devtools-app-setup"
-- when: "TanStack Devtools Vite plugin, source inspection, console piping, event bus, or production stripping"
-  use: "@tanstack/devtools-vite#devtools-vite-plugin"
-- when: "typed devtools event clients, bidirectional events, or instrumentation"
-  use: "@tanstack/devtools-event-client#devtools-event-client"
-- when: "TanStack Start server runtime, request/response utilities, cookies, sessions, or createStartHandler"
-use: "@tanstack/start-server-core#start-server-core"
 <!-- intent-skills:end -->

@@ -4,10 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm -r --no-sort dev",
+    "dev": "pnpm --parallel --filter @vitask/worker --filter @vitask/web dev",
+    "build": "vpr -r build",
     "check": "vpr -r check",
     "fix": "vpr -r fix",
-    "gen": "vpr -r gen"
+    "test": "vpr -r test",
+    "eval": "vpr --filter @vitask/evals eval",
+    "eval:faux": "vpr --filter @vitask/evals eval:faux",
+    "eval:matrix": "vpr --filter @vitask/evals eval:matrix"
   },
   "devDependencies": {
     "vite-plus": "catalog:"
@@ -19,7 +23,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
-      "lightningcss"
+      "lightningcss",
+      "workerd"
     ]
   }
 }

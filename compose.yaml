@@ -1,3 +1,117 @@
-# Convienient shortcut to run docker compose command in the project root
-include:
-  - docker/compose.yaml
+# Self-hosted vitask: one celld node, a local S3 bucket (RustFS) and Caddy for TLS, all on one machine.
+# Setup and caveats: docs/deploy.md#docker-compose. Copy .env.example to .env first.
+name: vitask
+
+x-bucket-env: &bucket-env
+  AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:?set S3_ACCESS_KEY in .env}
+  AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:?set S3_SECRET_KEY in .env}
+  AWS_REGION: us-east-1
+  S3_ENDPOINT: http://s3:9000
+  CELLD_BUCKET: s3://vitask
+
+services:
+  # celld keeps deployments, every workspace's SQLite and the D1 accounts database here.
+  s3:
+    image: rustfs/rustfs:1.0.6
+    command: ["/data"]
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY}
+    volumes:
+      - s3-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      retries: 30
+    restart: unless-stopped
+
+  # Creates the bucket once. 409 means it already exists.
+  bucket:
+    image: curlimages/curl:8.23.0
+    environment: *bucket-env
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        code=$$(curl -sS -o /dev/null -w '%{http_code}' -X PUT --aws-sigv4 aws:amz:us-east-1:s3
+        --user "$$AWS_ACCESS_KEY_ID:$$AWS_SECRET_ACCESS_KEY" http://s3:9000/vitask);
+        echo "create bucket: $$code"; [ "$$code" = 200 ] || [ "$$code" = 409 ]
+    depends_on:
+      s3:
+        condition: service_healthy
+
+  celld:
+    image: ghcr.io/denoland/celld:v0.6.3
+    # The internal listener (peers and the unauthenticated operator API) is reachable only on the compose network;
+    # the deploy job needs it for D1 migrations.
+    command:
+      ["--listen", "0.0.0.0:8080", "--internal-listen", "0.0.0.0:8081", "--advertise", "celld:8081"]
+    environment:
+      <<: *bucket-env
+      # Caddy terminates TLS; without this request.url is http:// and the Worker refuses https Origins.
+      CELLD_TRUST_FORWARDED_HEADERS: "1"
+      CELLD_IDLE_EVICT_S: "300"
+      CELLD_LTX_RETENTION_SECS: "86400"
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /.well-known/celld/health HTTP/1.0\r\n\r\n' >&3 && head -1 <&3 | grep -q ' 200 '
+      # celld holds every request until it serves a deployment, so this turns healthy only after `deploy` ran.
+      interval: 5s
+      timeout: 3s
+      retries: 60
+    stop_grace_period: 60s
+    depends_on:
+      bucket:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # Builds the web app and deploys the Worker into the bucket, then exits. The node picks it up within 30 s.
+  # After pulling changes: docker compose up --build deploy migrate
+  deploy:
+    image: vitask-jobs
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    environment:
+      <<: *bucket-env
+      GROQ_API_KEY: ${GROQ_API_KEY:?set GROQ_API_KEY in .env}
+      COOKIE_SECRET: ${COOKIE_SECRET:?set COOKIE_SECRET in .env}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in .env}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?set BETTER_AUTH_URL in .env}
+    depends_on:
+      bucket:
+        condition: service_completed_successfully
+
+  # Applies the D1 (accounts) migrations. `celld d1` goes through a node that serves a deployment.
+  migrate:
+    image: vitask-jobs
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    command: ["celld", "d1", "migrations", "apply", "vitask-auth", "."]
+    environment: *bucket-env
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+      celld:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2.11.9-alpine
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      VITASK_DOMAIN: ${VITASK_DOMAIN:?set VITASK_DOMAIN in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      - celld
+    restart: unless-stopped
+
+volumes:
+  s3-data:
+  caddy-data:
