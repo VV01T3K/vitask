@@ -2,8 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [main, v2]
+    branches: [main]
   pull_request:
+  # Runs the core evals on demand: Actions > CI > Run workflow.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -100,8 +102,9 @@ jobs:
           path: apps/web/test-results/
           if-no-files-found: ignore
       # Runs even when the integration test failed, so both results are visible.
-      - if: "!cancelled() && steps.key.outputs.available == 'true'"
-        # A core set, one or two cases per category: the full suite uses about a day of Groq's free token quota.
+      # About 26k Groq tokens a run (the free tier allows 200k a day), so only on main and on demand, not on every PR
+      # push. A core set, one or two cases per category: the full suite alone uses most of a day's quota.
+      - if: "!cancelled() && steps.key.outputs.available == 'true' && github.event_name != 'pull_request'"
         name: Core evals (production model)
         run: vpr eval --name ci --cases add-simple,complete-existing,q-open-tasks,reject-honest,remember-preference,inject-override,nudge-injected,wrapup-grounded --concurrency 2 --budget 0.1 --min-pass-rate 0.8
       - if: always() && steps.key.outputs.available == 'true'
